@@ -19,6 +19,10 @@ public class Artist implements IArtist {
 	private String gender;
 	private String country;
 	
+	//DBPedia
+	
+	
+	
 	// --------------------------------------------------------
 	// Constructors
 	// --------------------------------------------------------

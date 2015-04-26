@@ -86,5 +86,8 @@ public class LuceneDocument {
 	String releaseName;
 	String releaseType;
 	String releaseSongs; //comma-separated
+	
 	String releaseArtists; //comma-separated
+	
+	//Ids?
 }
