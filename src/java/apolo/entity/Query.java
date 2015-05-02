@@ -1,5 +1,8 @@
 package apolo.entity;
 
+import java.util.*;
+import apolo.queryrefinement.*;
+
 public class Query implements IQuery{
 
 	// --------------------------------------------------------
@@ -11,8 +14,8 @@ public class Query implements IQuery{
 	// Attributes
 	// --------------------------------------------------------
 
-	private String originalQuery;
-
+	private String originalQuery; /** Original query entered by the user */
+	private ArrayList<Annotation> annotations; /** List of entities recognized. If empty, then no entities were recognized */
 	
 	// --------------------------------------------------------
 	// Constructor
@@ -41,6 +44,11 @@ public class Query implements IQuery{
 	@Override
 	public String getOriginalQuery() {
 		return originalQuery;
+	}
+	
+	public void annotateQuery(){
+		NER ner = new NER(this.originalQuery);
+		this.annotations = ner.annotateQuery();
 	}
 	
 }

@@ -18,4 +18,9 @@ public interface IQuery {
 	 */
 	public String getOriginalQuery();
 	
+	/**
+	 * Finds the entities in the current query and saves them as a list within the query
+	 */
+	public void annotateQuery();
+	
 }
