@@ -14,14 +14,18 @@ public abstract class RankingItem implements IRankingItem {
 	// --------------------------------------------------------
 
 	private String type;
-
+	private double similarity;
 
 	// --------------------------------------------------------
 	// Getters and Setters
 	// --------------------------------------------------------
-
-	public String getType() {
+	@Override
+	public String getItemType() {
 		return type;
+	}
+	public void setItemType(String type)
+	{
+		this.type=type;
 	}
 
 
@@ -29,5 +33,15 @@ public abstract class RankingItem implements IRankingItem {
 		this.type = type;
 	}
 	
+	@Override
+	public double getSimilarity() {
+		return similarity;
+	}
+
+	@Override
+	public void setSimilarity(double sim) {
+		similarity=sim;
+		
+	}
 	
 }

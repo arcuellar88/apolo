@@ -21,6 +21,9 @@ public class Query implements IQuery{
 	// Constructor
 	// --------------------------------------------------------
 
+	
+
+
 	/**
 	 * Constructor
 	 * @param originalQuery
@@ -51,4 +54,8 @@ public class Query implements IQuery{
 		this.annotations = ner.annotateQuery();
 	}
 	
+	@Override
+	public ArrayList<Annotation> getAnnotations() {
+		return annotations;
+	}
 }

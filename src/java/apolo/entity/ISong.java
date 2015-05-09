@@ -10,7 +10,6 @@ public interface ISong {
 	// --------------------------------------------------------
 		
 	public int getSong_id();
-	
 	public void setSong_id(int song_id);
 	public String getTitle();
 	public void setTitle(String title);

@@ -6,12 +6,12 @@ public class Song extends RankingItem implements ISong{
 
 	
 	// --------------------------------------------------------
-		// Constants
-		// --------------------------------------------------------
+	// Constants
+	// --------------------------------------------------------
 
-		// --------------------------------------------------------
-		// Attributes
-		// --------------------------------------------------------
+	// --------------------------------------------------------
+	// Attributes
+	// --------------------------------------------------------
 
 	private int song_id;
 	private String title;
@@ -29,8 +29,6 @@ public class Song extends RankingItem implements ISong{
 	private String danceability;
 	private double key_value;
 	private double mode_value;
-	
-
 	
 	// --------------------------------------------------------
 	// Constructor

@@ -7,59 +7,69 @@ import apolo.msc.Global_Configuration;
 import apolo.msc.Log;
 
 public class DWConnector {
-	
-	private Connection connect = null;
-	
-	public DWConnector()
-	{
-		
+
+	private Connection connection = null;
+
+	public DWConnector() {
+		connect();
 	}
-	
-	public void connect(String host, String user, String pwd, String db)
-	{
-		try
-		{
-		 // this will load the MySQL driver, each DB has its own driver
-	      Class.forName("oracle.jdbc.driver.OracleDriver");
-	      // setup the connection with the DB.
-	      connect = DriverManager.getConnection("jdbc:oracle:thin:@//"+host+":1521/"+db,user,pwd);
-	      
-	      Log.println("CONNECTED");
+
+	private void connect() {
+		if (connection == null) {
+			try {
+				// this will load the MySQL driver, each DB has its own driver
+				Class.forName("oracle.jdbc.driver.OracleDriver");
+				// setup the connection with the DB.
+				String host = Global_Configuration.ORACLE_HOST;
+				String user = Global_Configuration.ORACLE_USER;
+				String pwd = Global_Configuration.ORACLE_PWD;
+				String db = Global_Configuration.ORACLE_DB;
+				connection = DriverManager.getConnection("jdbc:oracle:thin:@//"
+						+ host + ":1521/" + db, user, pwd);
+
+				Log.println("CONNECTED: oracle.jdbc.driver.OracleDriver");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
-	    catch (Exception e)
-		{ 
+	}
+
+	public void close() {
+		try {
+			connection.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Reads a query from a file
 	 * @param fileName
 	 * @return
 	 */
-	public IArtist getArtist(int artist_id)
-	{
-		//String query="SELECT ROWNUM ROW_NUM, SUBQ.* FROM (select ARTIST_ID, ARTIST_NAME, ARTIST_TYPE, GENDER from  APOLO_MASTER.DIMARTIST) SUBQ DWHERE ROWNUM <= 75";
-		String query="select ARTIST_ID, ARTIST_NAME, ARTIST_TYPE, GENDER from  APOLO_MASTER.DIMARTIST where artist_id=?";
+	public Artist getArtist(int artist_id) {
 		
-		IArtist artist=new Artist();
-		
-		try 
-		{
-			PreparedStatement ps=connect.prepareStatement(query);
-			ps.setInt(1, artist_id);
-	        ResultSet rs = ps.executeQuery();
-	        
-	        while (rs.next()) {
-	        	artist.setArtist_id(rs.getInt("artist_id"));
-	        	artist.setGender(rs.getString("GENDER"));
-	           artist.setName(rs.getString("ARTIST_NAME"));
-	           artist.setType(rs.getString("ARTIST_TYPE"));
+		// query="SELECT ROWNUM ROW_NUM, SUBQ.* FROM (select ARTIST_ID, ARTIST_NAME, ARTIST_TYPE, GENDER from  APOLO_MASTER.DIMARTIST) SUBQ DWHERE ROWNUM <= 75";
+		String query = "select ARTIST_ID, ARTIST_NAME, ARTIST_TYPE, GENDER from  APOLO_MASTER.DIMARTIST where artist_id=?";
+		Artist artist=null;
 
-	           Log.print(artist.toString());
-	        }
-			
-			
+		try {
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setInt(1, artist_id);
+			ResultSet rs = ps.executeQuery();
+
+			if (rs.next()) {
+				 artist = new Artist();
+
+				artist.setArtist_id(rs.getInt("artist_id"));
+				artist.setGender(rs.getString("GENDER"));
+				artist.setName(rs.getString("ARTIST_NAME"));
+				artist.setType(rs.getString("ARTIST_TYPE"));
+
+				Log.print(artist.toString());
+			}
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -67,31 +77,19 @@ public class DWConnector {
 		
 		return artist;
 	}
-	
-	
-	public static void main(String[] args)
-	{
+
+	public static void main(String[] args) {
 		DWConnector db = new DWConnector();
-		
-		//do not commit login details!
-		db.connect(Global_Configuration.ORACLE_HOST,Global_Configuration.ORACLE_USER,Global_Configuration.ORACLE_PWD,Global_Configuration.ORACLE_DB);
+
+		// do not commit login details!
 		try {
-			
+
 			db.getArtist(4264124);
-			
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-	}
 
-	public void close() {
-		try {
-			connect.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 }

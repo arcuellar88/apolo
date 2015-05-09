@@ -2,7 +2,7 @@ package apolo.entity;
 
 import java.util.Collection;
 
-public class Artist implements IArtist {
+public class Artist extends RankingItem implements IArtist {
 
 	// --------------------------------------------------------
 	// Constants

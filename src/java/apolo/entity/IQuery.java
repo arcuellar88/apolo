@@ -1,5 +1,9 @@
 package apolo.entity;
 
+import java.util.ArrayList;
+
+import apolo.queryrefinement.Annotation;
+
 public interface IQuery {
 
 	// --------------------------------------------------------
@@ -22,5 +26,11 @@ public interface IQuery {
 	 * Finds the entities in the current query and saves them as a list within the query
 	 */
 	public void annotateQuery();
+	
+	/**
+	 * Get the annotations of a query
+	 */
+	public ArrayList<Annotation> getAnnotations();
+	
 	
 }
