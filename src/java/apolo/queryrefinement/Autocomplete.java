@@ -128,7 +128,7 @@ public class Autocomplete {
 		    while(rs.next()){
 		    	String val = rs.getString("title");
 		    	val = val.substring(0,val.length()-1);
-		    	dictionary.put(val, 1); //1 is for ARTIST
+		    	dictionary.put(val, 2); //1 is for ARTIST
 		    }
 		}
 		catch (SQLException ex){
@@ -181,6 +181,40 @@ public class Autocomplete {
 		        stmt = null;
 		    }
 		}
+		
+		/** songs **/
+		/*
+		try {
+			System.out.println("starting songs");
+		    stmt = conn.createStatement();
+		    rs = stmt.executeQuery("SELECT title FROM songs_apolo");
+		    System.out.println("finished query");
+		    while(rs.next()){
+		    	String val = rs.getString("title");
+		    	val = val.substring(0,val.length()-1);
+		    	dictionary.put(val, 2); //1 is for SONG
+		    }
+		}
+		catch (SQLException ex){
+		}
+		finally {
+		    if (rs != null) {
+		        try {
+		            rs.close();
+		        } catch (SQLException sqlEx) { } // ignore
+
+		        rs = null;
+		    }
+
+		    if (stmt != null) {
+		        try {
+		            stmt.close();
+		        } catch (SQLException sqlEx) { } // ignore
+
+		        stmt = null;
+		    }
+		}
+		*/
 	}
 	
 	public Connection getConnection(){
@@ -193,17 +227,17 @@ public class Autocomplete {
 		}
 		return conn;
 	}
-	
+	/*
 	public static void main(String a[]){
 		Autocomplete ac = new Autocomplete();
-		String q2 = "Pear";
+		String q2 = "Ten Years";
 		String q = "One Nigh";
-		//n.trainModel();
+		String q3 = "Pearl";
 		ArrayList<String> comp;
 		System.out.println("load finished");
 		comp = ac.getCompletionsList(q);
 		Iterator<String> it = comp.iterator();
-		System.out.println("Query: "+q);
+		System.out.println("\n\nQuery: "+q);
 		while(it.hasNext()){
 			String rs = it.next();
 			System.out.println(rs);
@@ -211,11 +245,19 @@ public class Autocomplete {
 		
 		ArrayList<String> comp2 = ac.getCompletionsList(q2);
 		Iterator<String> it2 = comp2.iterator();
-		System.out.println("Query: "+q2);
+		System.out.println("\n\nQuery: "+q2);
 		while(it2.hasNext()){
 			String rs = it2.next();
 			System.out.println(rs);
 		}
-	}
+		
+		ArrayList<String> comp3 = ac.getCompletionsList(q3);
+		Iterator<String> it3 = comp3.iterator();
+		System.out.println("\n\nQuery: "+q3);
+		while(it3.hasNext()){
+			String rs = it3.next();
+			System.out.println(rs);
+		}
+	}*/
 
 }
