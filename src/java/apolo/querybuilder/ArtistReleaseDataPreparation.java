@@ -14,11 +14,14 @@ public class ArtistReleaseDataPreparation {
      */
     public final String releaseFile = "data/release.csv";
     public final String artistFile = "data/artist.csv";
+    public final String releaseSongFile = "data/releaseSong.csv";
     public  final List<HashMap<String, String>> artistList = new ArrayList<HashMap<String, String>>();
     public  final List<HashMap<String, String>> releaseList = new ArrayList<HashMap<String, String>>();
+    public  final List<HashMap<String, String>> releaseSongList = new ArrayList<HashMap<String, String>>();
 
     public final String separator = ",";
-    
+    public final String separator2 = " [|] ";
+    public final String separator3 = "  ";
     
     public static void main(String[] args) throws IOException {
         
@@ -29,7 +32,8 @@ public class ArtistReleaseDataPreparation {
     
         start = System.currentTimeMillis();
         //dp.readArtist();
-         dp.readRelease();
+        //dp.readRelease();
+        dp.readReleaseSong();
         System.out.println(" loaded_IN: " + (System.currentTimeMillis() - start));
         
     
@@ -39,14 +43,15 @@ public class ArtistReleaseDataPreparation {
     public void readArtist() throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(artistFile));
         String line;
-        HashMap<String, String> artistMap = new HashMap<String, String>();
+        
         
        while ((line = br.readLine()) != null) {
+     HashMap<String, String> artistMap = new HashMap<String, String>();
         line = br.readLine();
        
         if (line != null ){ 
           
-        	String[] txt = line.split(separator);
+            String[] txt = line.split(separator);
      
             artistMap.put("artistID", txt[0]);
             artistMap.put("artistName", txt[1]);
@@ -69,7 +74,7 @@ public class ArtistReleaseDataPreparation {
             }
             else
             {
-            	
+                
                 artistMap.put("artistRatingAVG", "");
                 artistMap.put("artistRatingCount", "");
                 artistMap.put("artistP", "");
@@ -87,11 +92,12 @@ public class ArtistReleaseDataPreparation {
     public void readRelease() throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(releaseFile));
         String line;
-        HashMap<String, String> releaseMap = new HashMap<String, String>();
+   
         
        while ((line = br.readLine()) != null) {
         line = br.readLine();
-     
+        HashMap<String, String> releaseMap = new HashMap<String, String>();
+        
         if (line != null ){
             String[] txt = line.split(separator);
 
@@ -102,12 +108,55 @@ public class ArtistReleaseDataPreparation {
             if(txt.length>=5)
             releaseMap.put("releaseArtist", txt[4]);
             else
-            	releaseMap.put("releaseArtist", "");
+                releaseMap.put("releaseArtist", "");
             releaseList.add(releaseMap);
             
         }
            
           
+        }
+        br.close();
+    }
+
+    public void readReleaseSong() throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(releaseSongFile));
+        String line;
+        int loop = 0;
+        
+      while (loop < 109) {
+          line = br.readLine();
+       
+        HashMap<String, String> SongMap = new HashMap<String, String>();
+        
+        if (line != null ){
+            String[] txt = line.split(separator);
+    
+            if (!txt[0].contains(separator2)) {
+            SongMap.put("releaseID", txt[0]);
+        
+                if (txt.length >=2 )
+                    SongMap.put("songID", txt[1]);
+                    else
+              SongMap.put("songID", "");
+                
+             if (txt.length >=3 )
+                    SongMap.put("songTitle", txt[2]);
+                    else
+              SongMap.put("songTitle", "");
+
+             releaseSongList.add(SongMap);
+             loop++;
+            }
+            else
+            {
+                String title = releaseSongList.get(loop-1).get("songTitle") + txt[0];
+                
+                releaseSongList.get(loop-1).put("songTitle", title);
+            
+            }            
+            
+          }
+ 
         }
         br.close();
     }
