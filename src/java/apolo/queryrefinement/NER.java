@@ -53,7 +53,7 @@ public class NER {
             // handle the error
         }
 		
-		loadDictionary();
+		loadDictionaryFromDB();
 	}
 	
 	public NER(String query){
@@ -65,7 +65,7 @@ public class NER {
 		this.releasesFile = fullpath + "releases.txt";
 		dictionaryExact = new MapDictionary<String>();
 		dictionaryApprox = new TrieDictionary<String>();
-		loadDictionary();
+		loadDictionaryFromDB();
 	}
 	
 	public ArrayList<Annotation> annotateQuery(){
@@ -144,7 +144,7 @@ public class NER {
 	 * It uses text files extracted from the DW containing all the information for songs, artists and releases
 	 * It assumes the ID attributes is the first one of every line and the title or name comes second
 	 */
-	private void loadDictionary(){
+	private void loadDictionaryFromFile(){
 		File songsFile = new File(this.songsFile);
 		File artistsFile = new File(this.artistsFile);
 		File releasesFile = new File(this.releasesFile);
@@ -210,11 +210,47 @@ public class NER {
 		Statement stmt = null;
 		ResultSet rs = null;
 		
+		/** artists **/
 		try {
 		    stmt = conn.createStatement();
-		    rs = stmt.executeQuery("SELECT title FROM songs_apolo");
+		    rs = stmt.executeQuery("SELECT title FROM artists_apolo");
 		    while(rs.next()){
-		    	
+		    	String val = rs.getString("title");
+		    	val = val.substring(0,val.length()-1);
+		    	dictionaryExact.addEntry(new DictionaryEntry<String>(val,"ARTIST",CHUNK_SCORE));
+				dictionaryApprox.addEntry(new DictionaryEntry<String>(val,"ARTIST"));
+		    }
+		}
+		catch (SQLException ex){
+		}
+		finally {
+		    if (rs != null) {
+		        try {
+		            rs.close();
+		        } catch (SQLException sqlEx) { } // ignore
+
+		        rs = null;
+		    }
+
+		    if (stmt != null) {
+		        try {
+		            stmt.close();
+		        } catch (SQLException sqlEx) { } // ignore
+
+		        stmt = null;
+		    }
+		}
+		
+		
+		/** releases **/
+		try {
+		    stmt = conn.createStatement();
+		    rs = stmt.executeQuery("SELECT title FROM releases_apolo");
+		    while(rs.next()){
+		    	String val = rs.getString("title");
+		    	val = val.substring(0,val.length()-1);
+		    	dictionaryExact.addEntry(new DictionaryEntry<String>(val,"RELEASE",CHUNK_SCORE));
+				dictionaryApprox.addEntry(new DictionaryEntry<String>(val,"RELEASE"));
 		    }
 		}
 		catch (SQLException ex){

@@ -3,11 +3,17 @@ package apolo.queryrefinement;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystem;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
 
+import com.aliasi.dict.DictionaryEntry;
 import com.aliasi.io.FileLineReader;
 import com.aliasi.spell.AutoCompleter;
 import com.aliasi.spell.FixedWeightEditDistance;
@@ -37,7 +43,7 @@ public class Autocomplete {
 		this.artistsFile = fullpath + "artists.txt";
 		this.releasesFile = fullpath + "releases.txt";
 		this.dictionary = new HashMap<String,Integer>(15000000);
-		loadDictionary();
+		loadDictionaryFromDB();
 		this.matchWeight = 0.0;
         this.insertWeight = -10.0;
         this.substituteWeight = -10.0;
@@ -50,7 +56,7 @@ public class Autocomplete {
         completer = new AutoCompleter(dictionary, editDistance, maxResults, maxQueueSize, minScore);
 	}
 	
-	private void loadDictionary(){
+	private void loadDictionaryFromFile(){
 		File songsFile = new File(this.songsFile);
 		File artistsFile = new File(this.artistsFile);
 		File releasesFile = new File(this.releasesFile);
@@ -106,6 +112,88 @@ public class Autocomplete {
 			completionsList.add(so.getObject());
 		}
 		return completionsList;
+	}
+	
+	/***
+	 * Loads the songs, artists and releases to the dictionary.
+	 * It uses the existing DB table to obtain all songs, artists and release names.
+	 */
+	private void loadDictionaryFromDB(){
+		Connection conn = getConnection();
+		Statement stmt = null;
+		ResultSet rs = null;
+		
+		/** artists **/
+		try {
+		    stmt = conn.createStatement();
+		    rs = stmt.executeQuery("SELECT title FROM artists_apolo");
+		    while(rs.next()){
+		    	String val = rs.getString("title");
+		    	val = val.substring(0,val.length()-1);
+		    	dictionary.put(val, 1); //1 is for ARTIST
+		    }
+		}
+		catch (SQLException ex){
+		}
+		finally {
+		    if (rs != null) {
+		        try {
+		            rs.close();
+		        } catch (SQLException sqlEx) { } // ignore
+
+		        rs = null;
+		    }
+
+		    if (stmt != null) {
+		        try {
+		            stmt.close();
+		        } catch (SQLException sqlEx) { } // ignore
+
+		        stmt = null;
+		    }
+		}
+		
+		
+		/** releases **/
+		try {
+		    stmt = conn.createStatement();
+		    rs = stmt.executeQuery("SELECT title FROM releases_apolo");
+		    while(rs.next()){
+		    	String val = rs.getString("title");
+		    	val = val.substring(0,val.length()-1);
+		    	dictionary.put(val, 2); //2 is for RELEASE
+		    }
+		}
+		catch (SQLException ex){
+		}
+		finally {
+		    if (rs != null) {
+		        try {
+		            rs.close();
+		        } catch (SQLException sqlEx) { } // ignore
+
+		        rs = null;
+		    }
+
+		    if (stmt != null) {
+		        try {
+		            stmt.close();
+		        } catch (SQLException sqlEx) { } // ignore
+
+		        stmt = null;
+		    }
+		}
+	}
+	
+	public Connection getConnection(){
+		Connection conn = null;
+		try {
+		    conn =
+		       DriverManager.getConnection("jdbc:mysql://localhost/apolo?" +
+		                                   "user=root&password=");
+		} catch (SQLException ex) {
+		}
+		return conn;
 	}
 
 }
