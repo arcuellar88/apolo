@@ -28,5 +28,9 @@ public interface IArtist {
 	 * @return
 	 */
 	public Collection<IRelease>getReleases();
+	public void setDescription(String description);
+	public String getDescription();
+	public void setURI(String textContent);
+	public String getURI();
 	
 }

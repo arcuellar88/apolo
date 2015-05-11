@@ -77,6 +77,7 @@ public class Recommender implements IRecommender {
 				dataModel = new ReloadFromJDBCDataModel(new MySQLJDBCDataModel(
 						dataSource, "taste_preferences2", "user_id", "item_id",
 						"preference", ""));
+				
 			} else {
 				// ORACLE
 				OracleDataSource dataSource = new OracleDataSource();
@@ -216,6 +217,9 @@ public class Recommender implements IRecommender {
 		}
 	}
 	
+	/**
+	 * 
+	 */
 	public void validator()
 	{
 		RecommenderEvaluator evaluator = new AverageAbsoluteDifferenceRecommenderEvaluator();
@@ -264,14 +268,19 @@ public class Recommender implements IRecommender {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		Log.println("START");
+
 		Recommender rd = new Recommender();
 
 		IArtist a = new Artist();
 
 		a.setArtist_id(4261880);
 		rd.getRecommendation(a, 5);
+		a.setArtist_id(4388813);
+		rd.getRecommendation(a, 5);
 		
-		rd.validator();
+		
+		//rd.validator();
 	}
 
 	/*

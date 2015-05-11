@@ -18,11 +18,16 @@ public class Artist extends RankingItem implements IArtist {
 	private String type;
 	private String gender;
 	private String country;
+	private String description;
+	private String URI;
 	
 	//DBPedia
 	
 	
 	
+	
+
+
 	// --------------------------------------------------------
 	// Constructors
 	// --------------------------------------------------------
@@ -90,6 +95,24 @@ public class Artist extends RankingItem implements IArtist {
 		this.country = country;
 	}
 
+	public void setDescription(String description)
+	{
+		this.description=description;
+	}
+	public String getDescription()
+	{
+		return description;
+	}
+	
+	public String getURI() {
+		return URI;
+	}
+
+
+	public void setURI(String uRI) {
+		URI = uRI;
+	}
+	
 	@Override
 	public Collection<IRelease> getReleases() {
 		// TODO Auto-generated method stub

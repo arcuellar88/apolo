@@ -17,6 +17,7 @@ import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 import apolo.entity.*;
+import apolo.msc.Log;
 
 public class DBPediaHTTPXML implements IDBpedia {
 	
@@ -56,32 +57,25 @@ public class DBPediaHTTPXML implements IDBpedia {
 		{
 			// get all child nodes
 	        NodeList nodes = root.getChildNodes();
-
-	        /* print the text content of each child
-	        for (int i = 0; i < nodes.getLength(); i++) {
-	           System.out.println("Name: " + nodes.item(i).getNodeName()+" Value:"+nodes.item(i).);
-	        }
-	        */
-			
-			Node nodo2=nodes.item(1); 
-			
-	        System.out.println(nodo2.getNodeName());
-
 	        
-	        nodes = nodo2.getChildNodes();
-	        
-	        for (int i = 0; i < nodes.getLength(); i++) {
-		            System.out.println("Name: " + nodes.item(i).getNodeName()+" Value:"+nodes.item(i).getTextContent());
-		         }
-	        
-	        Node nodo3=nodes.item(6);
-	        System.out.println(nodo3.getNodeName());
+	        if(nodes.getLength()>0)
+	        	{
+	        	Node nodo2=nodes.item(1); 
+	        	 nodes = nodo2.getChildNodes();
+	 	        
+	 	        for (int i = 0; i < nodes.getLength(); i++) {
+	 	        	
+	 		            //Log.println("Name: " + nodes.item(i).getNodeName()+" Value:"+nodes.item(i).getTextContent());
+	 		        //Look for the description    
+	 	        	if(nodes.item(i).getNodeName().equals("Description"))
+	 		            	a.setDescription(nodes.item(i).getTextContent().trim());
+	 	        	if(nodes.item(i).getNodeName().equals("URI"))
+ 		            	a.setURI(nodes.item(i).getTextContent());
 
-	        nodes = nodo3.getChildNodes();
-			      
-	        for (int i = 0; i < nodes.getLength(); i++) {
-		            System.out.println("Name: " + nodes.item(i).getNodeName()+" Value:"+nodes.item(i).getTextContent());
-		         }
+	 	        }
+	 	       
+	        	}  
+	        
 		}        
         
 		return a;
@@ -152,7 +146,7 @@ public class DBPediaHTTPXML implements IDBpedia {
 	 * Method to print the HTTP Request (Structure of the XML)
 	 * Testing purposes
 	 */
-	private void printHttpRequest()
+	public void printHttpRequest()
 	{
 		try {
 			//QueryClass=person	
@@ -191,8 +185,12 @@ public class DBPediaHTTPXML implements IDBpedia {
 	
 	public static void main(String[] args)
 	{
-		DBPediaHTTPXML db= new DBPediaHTTPXML();
-		db.printHttpRequest();
+		IDBpedia db= new DBPediaHTTPXML();
+		//db.printHttpRequest();
+		IArtist a = new Artist();
+		a.setName("Shakira");
+		db.getAdditionalInformationArtist(a);
+		Log.println("Description" + a.getDescription());
 		
 	}
 }
