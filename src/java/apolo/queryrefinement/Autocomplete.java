@@ -2,6 +2,7 @@ package apolo.queryrefinement;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,9 +31,11 @@ public class Autocomplete {
 	private AutoCompleter completer;
 	
 	public Autocomplete(){
-		this.songsFile = "songs.txt";
-		this.artistsFile = "artists.txt";
-		this.releasesFile = "releases.txt";
+		String path = System.getProperty("user.dir");
+		String fullpath = path + File.separator + "src" + File.separator + "java" + File.separator + "apolo" + File.separator + "queryrefinement" + File.separator;
+		this.songsFile = fullpath + "songs.txt";
+		this.artistsFile = fullpath + "artists.txt";
+		this.releasesFile = fullpath + "releases.txt";
 		this.dictionary = new HashMap<String,Integer>(15000000);
 		loadDictionary();
 		this.matchWeight = 0.0;
@@ -55,38 +58,44 @@ public class Autocomplete {
 		String[] artists = null;
 		String[] releases = null;
 		try{
-			songs = FileLineReader.readLineArray(songsFile,"ISO-8859-1");
-			artists = FileLineReader.readLineArray(artistsFile,"ISO-8859-1");
-			releases = FileLineReader.readLineArray(releasesFile,"ISO-8859-1");
+			songs = FileLineReader.readLineArray(songsFile,"UTF-8");
+			artists = FileLineReader.readLineArray(artistsFile,"UTF-8");
+			releases = FileLineReader.readLineArray(releasesFile,"UTF-8");
 		}catch(IOException ioe){
 			System.out.println("ERROR: problem reading dictionary files on loadDictionary");
 		}
 		
 		//add all the song titles to the dictionary
-		for(String song : songs){
-			int f = song.indexOf("\t");
-			int i = song.indexOf("\t", f);
-            if (i < 0) continue;
-            String title = song.substring(f+1,i);
-			dictionary.put(title, 0); //0 is for SONG
+		if(songs != null){
+			for(String song : songs){
+				int f = song.indexOf("\t");
+				int i = song.indexOf("\t", f);
+	            if (i < 0) continue;
+	            String title = song.substring(f+1,i);
+				dictionary.put(title, 0); //0 is for SONG
+			}
 		}
 		
 		//add all the artist names to the dictionary
-		for(String artist : artists){
-			int f = artist.indexOf("\t");
-			int i = artist.indexOf("\t", f);
-            if (i < 0) continue;
-            String name = artist.substring(f+1,i);
-			dictionary.put(name, 1); //1 is for ARTIST
+		if(artists != null){
+			for(String artist : artists){
+				int f = artist.indexOf("\t");
+				int i = artist.indexOf("\t", f);
+	            if (i < 0) continue;
+	            String name = artist.substring(f+1,i);
+				dictionary.put(name, 1); //1 is for ARTIST
+			}
 		}
 		
 		//add all the release names to the dictionary
-		for(String release : releases){
-			int f = release.indexOf("\t");
-			int i = release.indexOf("\t", f);
-            if (i < 0) continue;
-            String name = release.substring(f+1,i);
-			dictionary.put(name, 2); //2 is for RELEASE
+		if(releases != null){
+			for(String release : releases){
+				int f = release.indexOf("\t");
+				int i = release.indexOf("\t", f);
+	            if (i < 0) continue;
+	            String name = release.substring(f+1,i);
+				dictionary.put(name, 2); //2 is for RELEASE
+			}
 		}
 	}
 	

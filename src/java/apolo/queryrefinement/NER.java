@@ -2,6 +2,8 @@ package apolo.queryrefinement;
 
 import java.util.*;
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import com.aliasi.chunk.Chunk;
 import com.aliasi.chunk.Chunking;
@@ -15,6 +17,12 @@ import com.aliasi.spell.FixedWeightEditDistance;
 import com.aliasi.spell.WeightedEditDistance;
 import com.aliasi.tokenizer.IndoEuropeanTokenizerFactory;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.ResultSet;
+
 public class NER {
 
 	private String query; /** Query that needs to be enhanced */
@@ -26,17 +34,48 @@ public class NER {
 	TrieDictionary<String> dictionaryApprox;
 	private static final double CHUNK_SCORE = 1.0;
 	
+	public NER(){
+		this.query="";
+		String path = System.getProperty("user.dir");
+		String fullpath = path + File.separator + "src" + File.separator + "java" + File.separator + "apolo" + File.separator + "queryrefinement" + File.separator;
+		this.songsFile = fullpath + "songs.txt";
+		this.artistsFile = fullpath + "artists.txt";
+		this.releasesFile = fullpath + "releases.txt";
+		dictionaryExact = new MapDictionary<String>();
+		dictionaryApprox = new TrieDictionary<String>();
+		
+		try {
+            // The newInstance() call is a work around for some
+            // broken Java implementations
+
+            Class.forName("com.mysql.jdbc.Driver").newInstance();
+        } catch (Exception ex) {
+            // handle the error
+        }
+		
+		loadDictionary();
+	}
 	
 	public NER(String query){
 		this.query=query;
-		this.songsFile = "songs.txt";
-		this.artistsFile = "artists.txt";
-		this.releasesFile = "releases.txt";
+		String path = System.getProperty("user.dir");
+		String fullpath = path + File.separator + "src" + File.separator + "java" + File.separator + "apolo" + File.separator + "queryrefinement" + File.separator;
+		this.songsFile = fullpath + "songs.txt";
+		this.artistsFile = fullpath + "artists.txt";
+		this.releasesFile = fullpath + "releases.txt";
 		dictionaryExact = new MapDictionary<String>();
 		dictionaryApprox = new TrieDictionary<String>();
+		loadDictionary();
 	}
 	
 	public ArrayList<Annotation> annotateQuery(){
+		ArrayList<Annotation> annotations = new ArrayList<Annotation>();
+		annotations = findNamedEntities();
+		return annotations;
+	}
+	
+	public ArrayList<Annotation> annotateQuery(String q){
+		this.query = q;
 		ArrayList<Annotation> annotations = new ArrayList<Annotation>();
 		annotations = findNamedEntities();
 		return annotations;
@@ -113,9 +152,9 @@ public class NER {
 		String[] artists = null;
 		String[] releases = null;
 		try{
-			songs = FileLineReader.readLineArray(songsFile,"ISO-8859-1");
-			artists = FileLineReader.readLineArray(songsFile,"ISO-8859-1");
-			releases = FileLineReader.readLineArray(songsFile,"ISO-8859-1");
+			//songs = FileLineReader.readLineArray(songsFile,"UTF-8");
+			artists = FileLineReader.readLineArray(artistsFile,"UTF-8");
+			releases = FileLineReader.readLineArray(releasesFile,"UTF-8");
 		}catch(IOException ioe){
 			System.out.println("ERROR: problem reading dictionary files on loadDictionary");
 		}
@@ -123,42 +162,103 @@ public class NER {
 		//*** ASSUMING TAB SEPARATED FILES AND THE NAMES ARE LOCATED IN THE SECOND VALUE ON THE FILES
 		
 		//add all the song titles to the dictionary
-		for(String song : songs){
-			int f = song.indexOf("\t");
-			int i = song.indexOf("\t", f);
-            if (i < 0) continue;
-            String title = song.substring(f+1,i);
-			dictionaryExact.addEntry(new DictionaryEntry<String>(title,"SONG",CHUNK_SCORE));
-			dictionaryApprox.addEntry(new DictionaryEntry<String>(title,"SONG"));
+		if(songs != null){
+			for(String song : songs){
+				//int f = song.indexOf("\t");
+				//int i = song.indexOf("\t", f);
+	            //if (i < 0) continue;
+	            //String title = song.substring(f+1,i);
+				String title = song;
+				dictionaryExact.addEntry(new DictionaryEntry<String>(title,"SONG",CHUNK_SCORE));
+				dictionaryApprox.addEntry(new DictionaryEntry<String>(title,"SONG"));
+			}
 		}
 		
 		//add all the artist names to the dictionary
-		for(String artist : artists){
-			int f = artist.indexOf("\t");
-			int i = artist.indexOf("\t", f);
-            if (i < 0) continue;
-            String name = artist.substring(f+1,i);
-			dictionaryExact.addEntry(new DictionaryEntry<String>(name,"ARTIST",CHUNK_SCORE));
-			dictionaryApprox.addEntry(new DictionaryEntry<String>(name,"ARTIST"));
+		if(artists != null){
+			for(String artist : artists){
+				//int f = artist.indexOf("\t");
+				//int i = artist.indexOf("\t", f);
+	            //if (i < 0) continue;
+	            //String name = artist.substring(f+1,i);
+				String name = artist;
+				dictionaryExact.addEntry(new DictionaryEntry<String>(name,"ARTIST",CHUNK_SCORE));
+				dictionaryApprox.addEntry(new DictionaryEntry<String>(name,"ARTIST"));
+			}
 		}
 		
 		//add all the release names to the dictionary
-		for(String release : releases){
-			int f = release.indexOf("\t");
-			int i = release.indexOf("\t", f);
-            if (i < 0) continue;
-            String name = release.substring(f+1,i);
-			dictionaryExact.addEntry(new DictionaryEntry<String>(name,"RELEASE",CHUNK_SCORE));
-			dictionaryApprox.addEntry(new DictionaryEntry<String>(name,"RELEASE"));
+		if(releases != null){
+			for(String release : releases){
+				//int f = release.indexOf("\t");
+				//int i = release.indexOf("\t", f);
+	            //if (i < 0) continue;
+	            //String name = release.substring(f+1,i);
+				String name = release;
+				dictionaryExact.addEntry(new DictionaryEntry<String>(name,"RELEASE",CHUNK_SCORE));
+				dictionaryApprox.addEntry(new DictionaryEntry<String>(name,"RELEASE"));
+			}
 		}
 	}
 	
 	/***
 	 * Loads the songs, artists and releases to the dictionary.
-	 * It uses the existing Lucene index to obtain all songs, artists and release names.
+	 * It uses the existing DB table to obtain all songs, artists and release names.
 	 */
-	private void loadDictionaryFromLucene(){
+	private void loadDictionaryFromDB(){
+		Connection conn = getConnection();
+		Statement stmt = null;
+		ResultSet rs = null;
 		
+		try {
+		    stmt = conn.createStatement();
+		    rs = stmt.executeQuery("SELECT title FROM songs_apolo");
+		    while(rs.next()){
+		    	
+		    }
+		}
+		catch (SQLException ex){
+		}
+		finally {
+		    if (rs != null) {
+		        try {
+		            rs.close();
+		        } catch (SQLException sqlEx) { } // ignore
+
+		        rs = null;
+		    }
+
+		    if (stmt != null) {
+		        try {
+		            stmt.close();
+		        } catch (SQLException sqlEx) { } // ignore
+
+		        stmt = null;
+		    }
+		}
+	}
+	
+	public Connection getConnection(){
+		Connection conn = null;
+		try {
+		    conn =
+		       DriverManager.getConnection("jdbc:mysql://localhost/apolo?" +
+		                                   "user=root&password=");
+		} catch (SQLException ex) {
+		}
+		return conn;
+	}
+	
+	public static void main(String args[]){
+		String q = "Pearl Jam is an artist, Queen is an artist as well, Crystal Starr Knighton is another artist, \"One Night At The Opra\" is a release but \"Bohemian Rhapsody\" is a song";
+		NER n = new NER();
+		ArrayList<Annotation> nes = n.annotateQuery(q);
+		Iterator<Annotation> it = nes.iterator();
+		System.out.println("Query: "+q);
+		while(it.hasNext()){
+			Annotation a = it.next();
+			System.out.println(a.getEntityValue() + "\t" + a.getEntityType());
+		}
 	}
 
 }
