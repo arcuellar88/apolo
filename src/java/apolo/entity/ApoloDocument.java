@@ -1,10 +1,11 @@
-package apolo.documentation;
+package apolo.entity;
 
 /**
- * This is for referencing which fields we should index. We are not use this class for implementation 
+ * This is for referencing which fields we should index. We do not use this class for implementation 
  */
 
-public class LuceneDocument {
+public class ApoloDocument {
+	String documentId;
 	String type = "artist/song/release";
 	String timestamp;
 	
@@ -13,6 +14,7 @@ public class LuceneDocument {
 	 */
 	
 	String artistId; //ID from DW
+	String artistYahooId;
 	String artistName;
 	String artistType;
 	String artistGender;
@@ -20,10 +22,11 @@ public class LuceneDocument {
 	String artistContinent;
 	double artistRating; //AVG rating
 	String artistRating_type = "positive/neutral/negative";
-	int numberOfRating;
-	int numberOfPositiveRating;
-	int numberOfNegativeRating;
-	int numberOfNeutralRating;
+	String ratingTimestamp = "";
+	int artistNumberOfRating;
+	int aritstNumberOfPositiveRating;
+	int artistNumberOfNegativeRating;
+	int artistNumberOfNeutralRating;
 	
 	
 	/**
@@ -32,7 +35,10 @@ public class LuceneDocument {
 	
 	//For song
 	String songID; //ID from DW
-	double songDurating; //In second
+	String songEchonestID;
+	String songMBID;
+	String songTitle;
+	double songDuration; //In second
 	double songTempo;
 	double songLoudness;
 	double songEnergy;
@@ -42,6 +48,7 @@ public class LuceneDocument {
 	//Rating
 	double songRating;
 	String songRatingType;
+	int songNumberOfRating;
 	
 	//Song country
 	String songSimilarSongIds = "songID1,songID2,songID3"; //comma-separated string
@@ -50,18 +57,28 @@ public class LuceneDocument {
 	
 	//Genre
 	String songGenres = "Pop,Rock"; //comma-seprated string
-	String songGenreCategories; //comma-separated string
-	String songGenreSubCategories; //comma-separated string
+	String songSubGenres; //comma-separated string
+	
+	//
+	String songGenreLinking = "";
 	
 	//Label
 	String songLabel = ""; //comma-separated string
 	
 	//Song date
 	String songDate; //String in the lucene format(so that can search in range). Need to check again new version 5.1.0 if it natively support time
-	int songYear;
 	int songMonth;
+	int songYear;
+	String songDayOfWeek;
+	String songQuarter;
 	String songDecade;
-	String dayOfWeek;
+	
+	//Song release
+	String songReleaseID;
+	String songReleaseName;
+	String songReleaseType;
+	String songReleaseMBID;
+	
 	
 	//Song artist
 	String songArtists = "Shakira,Bruno"; //commpa-separted
@@ -76,7 +93,7 @@ public class LuceneDocument {
 	String songLyrics;
 	
 	//Should we include the playcount here?
-	
+	int songTotalPlayCount;
 	
 	/**
 	 * PROTOTYPE FOR RELEASE
@@ -86,8 +103,6 @@ public class LuceneDocument {
 	String releaseName;
 	String releaseType;
 	String releaseSongs; //comma-separated
-	
+	String releaseSongIds;
 	String releaseArtists; //comma-separated
-	
-	//Ids?
 }

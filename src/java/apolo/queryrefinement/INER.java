@@ -9,10 +9,11 @@ public interface INER {
 	// --------------------------------------------------------
 
 	/**
-	 * Get named entities as a list of Annotations
-	 * @param originalQuery
+	 * Get named entities in the query that was input by the user
+	 * Returns a list of Annotations. The list is empty if none is found
+	 * @param original query
 	 */
-	public ArrayList<Annotation> getNamedEntities();
+	public ArrayList<Annotation> getNamedEntities(String query);
 	
 
 	

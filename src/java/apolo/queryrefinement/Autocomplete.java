@@ -2,11 +2,16 @@ package apolo.queryrefinement;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedSet;
-
 import com.aliasi.io.FileLineReader;
 import com.aliasi.spell.AutoCompleter;
 import com.aliasi.spell.FixedWeightEditDistance;
@@ -30,11 +35,13 @@ public class Autocomplete {
 	private AutoCompleter completer;
 	
 	public Autocomplete(){
-		this.songsFile = "songs.txt";
-		this.artistsFile = "artists.txt";
-		this.releasesFile = "releases.txt";
+		String path = System.getProperty("user.dir");
+		String fullpath = path + File.separator + "src" + File.separator + "java" + File.separator + "apolo" + File.separator + "queryrefinement" + File.separator;
+		this.songsFile = fullpath + "songs.txt";
+		this.artistsFile = fullpath + "artists.txt";
+		this.releasesFile = fullpath + "releases.txt";
 		this.dictionary = new HashMap<String,Integer>(15000000);
-		loadDictionary();
+		loadDictionaryFromDB();
 		this.matchWeight = 0.0;
         this.insertWeight = -10.0;
         this.substituteWeight = -10.0;
@@ -47,7 +54,7 @@ public class Autocomplete {
         completer = new AutoCompleter(dictionary, editDistance, maxResults, maxQueueSize, minScore);
 	}
 	
-	private void loadDictionary(){
+	private void loadDictionaryFromFile(){
 		File songsFile = new File(this.songsFile);
 		File artistsFile = new File(this.artistsFile);
 		File releasesFile = new File(this.releasesFile);
@@ -55,38 +62,44 @@ public class Autocomplete {
 		String[] artists = null;
 		String[] releases = null;
 		try{
-			songs = FileLineReader.readLineArray(songsFile,"ISO-8859-1");
-			artists = FileLineReader.readLineArray(artistsFile,"ISO-8859-1");
-			releases = FileLineReader.readLineArray(releasesFile,"ISO-8859-1");
+			songs = FileLineReader.readLineArray(songsFile,"UTF-8");
+			artists = FileLineReader.readLineArray(artistsFile,"UTF-8");
+			releases = FileLineReader.readLineArray(releasesFile,"UTF-8");
 		}catch(IOException ioe){
 			System.out.println("ERROR: problem reading dictionary files on loadDictionary");
 		}
 		
 		//add all the song titles to the dictionary
-		for(String song : songs){
-			int f = song.indexOf("\t");
-			int i = song.indexOf("\t", f);
-            if (i < 0) continue;
-            String title = song.substring(f+1,i);
-			dictionary.put(title, 0); //0 is for SONG
+		if(songs != null){
+			for(String song : songs){
+				int f = song.indexOf("\t");
+				int i = song.indexOf("\t", f);
+	            if (i < 0) continue;
+	            String title = song.substring(f+1,i);
+				dictionary.put(title, 0); //0 is for SONG
+			}
 		}
 		
 		//add all the artist names to the dictionary
-		for(String artist : artists){
-			int f = artist.indexOf("\t");
-			int i = artist.indexOf("\t", f);
-            if (i < 0) continue;
-            String name = artist.substring(f+1,i);
-			dictionary.put(name, 1); //1 is for ARTIST
+		if(artists != null){
+			for(String artist : artists){
+				int f = artist.indexOf("\t");
+				int i = artist.indexOf("\t", f);
+	            if (i < 0) continue;
+	            String name = artist.substring(f+1,i);
+				dictionary.put(name, 1); //1 is for ARTIST
+			}
 		}
 		
 		//add all the release names to the dictionary
-		for(String release : releases){
-			int f = release.indexOf("\t");
-			int i = release.indexOf("\t", f);
-            if (i < 0) continue;
-            String name = release.substring(f+1,i);
-			dictionary.put(name, 2); //2 is for RELEASE
+		if(releases != null){
+			for(String release : releases){
+				int f = release.indexOf("\t");
+				int i = release.indexOf("\t", f);
+	            if (i < 0) continue;
+	            String name = release.substring(f+1,i);
+				dictionary.put(name, 2); //2 is for RELEASE
+			}
 		}
 	}
 	
@@ -98,5 +111,153 @@ public class Autocomplete {
 		}
 		return completionsList;
 	}
+	
+	/***
+	 * Loads the songs, artists and releases to the dictionary.
+	 * It uses the existing DB table to obtain all songs, artists and release names.
+	 */
+	private void loadDictionaryFromDB(){
+		Connection conn = getConnection();
+		Statement stmt = null;
+		ResultSet rs = null;
+		
+		/** artists **/
+		try {
+		    stmt = conn.createStatement();
+		    rs = stmt.executeQuery("SELECT title FROM artists_apolo");
+		    while(rs.next()){
+		    	String val = rs.getString("title");
+		    	val = val.substring(0,val.length()-1);
+		    	dictionary.put(val, 2); //1 is for ARTIST
+		    }
+		}
+		catch (SQLException ex){
+		}
+		finally {
+		    if (rs != null) {
+		        try {
+		            rs.close();
+		        } catch (SQLException sqlEx) { } // ignore
+
+		        rs = null;
+		    }
+
+		    if (stmt != null) {
+		        try {
+		            stmt.close();
+		        } catch (SQLException sqlEx) { } // ignore
+
+		        stmt = null;
+		    }
+		}
+		
+		
+		/** releases **/
+		try {
+		    stmt = conn.createStatement();
+		    rs = stmt.executeQuery("SELECT title FROM releases_apolo");
+		    while(rs.next()){
+		    	String val = rs.getString("title");
+		    	val = val.substring(0,val.length()-1);
+		    	dictionary.put(val, 2); //2 is for RELEASE
+		    }
+		}
+		catch (SQLException ex){
+		}
+		finally {
+		    if (rs != null) {
+		        try {
+		            rs.close();
+		        } catch (SQLException sqlEx) { } // ignore
+
+		        rs = null;
+		    }
+
+		    if (stmt != null) {
+		        try {
+		            stmt.close();
+		        } catch (SQLException sqlEx) { } // ignore
+
+		        stmt = null;
+		    }
+		}
+		
+		/** songs **/
+		/*
+		try {
+			System.out.println("starting songs");
+		    stmt = conn.createStatement();
+		    rs = stmt.executeQuery("SELECT title FROM songs_apolo");
+		    System.out.println("finished query");
+		    while(rs.next()){
+		    	String val = rs.getString("title");
+		    	val = val.substring(0,val.length()-1);
+		    	dictionary.put(val, 2); //1 is for SONG
+		    }
+		}
+		catch (SQLException ex){
+		}
+		finally {
+		    if (rs != null) {
+		        try {
+		            rs.close();
+		        } catch (SQLException sqlEx) { } // ignore
+
+		        rs = null;
+		    }
+
+		    if (stmt != null) {
+		        try {
+		            stmt.close();
+		        } catch (SQLException sqlEx) { } // ignore
+
+		        stmt = null;
+		    }
+		}
+		*/
+	}
+	
+	public Connection getConnection(){
+		Connection conn = null;
+		try {
+		    conn =
+		       DriverManager.getConnection("jdbc:mysql://localhost/apolo?" +
+		                                   "user=root&password=");
+		} catch (SQLException ex) {
+		}
+		return conn;
+	}
+	/*
+	public static void main(String a[]){
+		Autocomplete ac = new Autocomplete();
+		String q2 = "Ten Years";
+		String q = "One Nigh";
+		String q3 = "Pearl";
+		ArrayList<String> comp;
+		System.out.println("load finished");
+		comp = ac.getCompletionsList(q);
+		Iterator<String> it = comp.iterator();
+		System.out.println("\n\nQuery: "+q);
+		while(it.hasNext()){
+			String rs = it.next();
+			System.out.println(rs);
+		}
+		
+		ArrayList<String> comp2 = ac.getCompletionsList(q2);
+		Iterator<String> it2 = comp2.iterator();
+		System.out.println("\n\nQuery: "+q2);
+		while(it2.hasNext()){
+			String rs = it2.next();
+			System.out.println(rs);
+		}
+		
+		ArrayList<String> comp3 = ac.getCompletionsList(q3);
+		Iterator<String> it3 = comp3.iterator();
+		System.out.println("\n\nQuery: "+q3);
+		while(it3.hasNext()){
+			String rs = it3.next();
+			System.out.println(rs);
+		}
+	}*/
 
 }
