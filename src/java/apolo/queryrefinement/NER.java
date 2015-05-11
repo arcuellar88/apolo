@@ -2,20 +2,16 @@ package apolo.queryrefinement;
 
 import java.util.*;
 import java.io.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import com.aliasi.chunk.Chunk;
 import com.aliasi.chunk.Chunking;
-import com.aliasi.dict.ApproxDictionaryChunker;
 import com.aliasi.dict.DictionaryEntry;
 import com.aliasi.dict.ExactDictionaryChunker;
 import com.aliasi.dict.MapDictionary;
 import com.aliasi.dict.TrieDictionary;
 import com.aliasi.io.FileLineReader;
-import com.aliasi.spell.FixedWeightEditDistance;
-import com.aliasi.spell.WeightedEditDistance;
 import com.aliasi.tokenizer.IndoEuropeanTokenizerFactory;
+
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -23,27 +19,25 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.ResultSet;
 
+
 public class NER {
 
 	private String query; /** Query that needs to be enhanced */
-	private String songsFile;
+	//private String songsFile;
 	private String artistsFile;
 	private String releasesFile;
 	//another variable could be the Lucene index if we use it to get the entities
-	MapDictionary<String> dictionaryExact; /** Dictionary that contains the entities that will be recognized */
-	TrieDictionary<String> dictionaryApprox;
+	//MapDictionary<String> dictionaryExact; /** Dictionary that contains the entities that will be recognized */
+	ExactDictionaryChunker dictionaryChunkerExact;
 	private static final double CHUNK_SCORE = 1.0;
 	
 	public NER(){
 		this.query="";
 		String path = System.getProperty("user.dir");
 		String fullpath = path + File.separator + "src" + File.separator + "java" + File.separator + "apolo" + File.separator + "queryrefinement" + File.separator;
-		this.songsFile = fullpath + "songs.txt";
+		//this.songsFile = fullpath + "songs.txt";
 		this.artistsFile = fullpath + "artists.txt";
 		this.releasesFile = fullpath + "releases.txt";
-		dictionaryExact = new MapDictionary<String>();
-		dictionaryApprox = new TrieDictionary<String>();
-		
 		try {
             // The newInstance() call is a work around for some
             // broken Java implementations
@@ -60,11 +54,9 @@ public class NER {
 		this.query=query;
 		String path = System.getProperty("user.dir");
 		String fullpath = path + File.separator + "src" + File.separator + "java" + File.separator + "apolo" + File.separator + "queryrefinement" + File.separator;
-		this.songsFile = fullpath + "songs.txt";
+		//this.songsFile = fullpath + "songs.txt";
 		this.artistsFile = fullpath + "artists.txt";
 		this.releasesFile = fullpath + "releases.txt";
-		dictionaryExact = new MapDictionary<String>();
-		dictionaryApprox = new TrieDictionary<String>();
 		loadDictionaryFromDB();
 	}
 	
@@ -76,6 +68,7 @@ public class NER {
 	
 	public ArrayList<Annotation> annotateQuery(String q){
 		this.query = q;
+		System.out.println("Start query annotation");
 		ArrayList<Annotation> annotations = new ArrayList<Annotation>();
 		annotations = findNamedEntities();
 		return annotations;
@@ -84,7 +77,6 @@ public class NER {
 	private ArrayList<Annotation> findNamedEntities(){
 		ArrayList<Annotation> annotations = new ArrayList<Annotation>();
 		//First look if there are any " in the query, to look for exact matches
-		boolean findExactMatch = false;
 		ArrayList<String> exactQueryElems = new ArrayList<String>(); //this list won't have any elements if the query doesn't have any exact match requests (defined with "...")
 										 //But if the query has exact match requests, then it will have one element per string within quotes
 		ArrayList<String> approxQueryElems = new ArrayList<String>(); //this list will have only one element if there are no quotes within the query
@@ -97,8 +89,8 @@ public class NER {
 				exactQueryElems.add(elems[i]);
 			}
 		}
+		
 		if(!exactQueryElems.isEmpty()){
-			ExactDictionaryChunker dictionaryChunkerExact = new ExactDictionaryChunker(dictionaryExact, IndoEuropeanTokenizerFactory.INSTANCE, true,false);
 			Iterator<String> it = exactQueryElems.iterator();
 			while(it.hasNext()){
 				String text = it.next();
@@ -106,29 +98,30 @@ public class NER {
 				for (Chunk chunk : chunking.chunkSet()) {
 					int start = chunk.start();
 		            int end = chunk.end();
-		            String type = chunk.type();
-		            double score = chunk.score();
-		            String phrase = text.substring(start,end);
-		            annotations.add(new Annotation(phrase,type,start,end,0,phrase.length()));
+					String phrase = text.substring(start,end);
+					//System.out.println(phrase);
+		            if(phrase.equalsIgnoreCase(text)){
+			            String type = chunk.type();
+		            	annotations.add(new Annotation(phrase,type,start,end,0,phrase.length()));
+		            }
 				}
 			}
 		}
 		if(!approxQueryElems.isEmpty()){
-	        WeightedEditDistance editDistance = new FixedWeightEditDistance(0,-1,-1,-1,Double.NaN);
-	        double maxDistance = 3.0;
-	        ApproxDictionaryChunker dictionaryChunkerApprox = new ApproxDictionaryChunker(dictionaryApprox,IndoEuropeanTokenizerFactory.INSTANCE, editDistance,maxDistance);
 	        Iterator<String> it = approxQueryElems.iterator();
 	        while(it.hasNext()){
 	        	String text = it.next();
-	        	Chunking chunking = dictionaryChunkerApprox.chunk(text);
+	        	Chunking chunking = dictionaryChunkerExact.chunk(text);
 	        	for (Chunk chunk : chunking.chunkSet()) {
 	        		int start = chunk.start();
 	                int end = chunk.end();
 	                String type = chunk.type();
 	                double distance = chunk.score();
 	                String phrase = chunking.charSequence().subSequence(start,end).toString();
-	                annotations.add(new Annotation(phrase,type,start,end,distance,phrase.length()));
-	                
+	                //System.out.println(phrase);
+	                if(phrase.length()>1){
+	                	annotations.add(new Annotation(phrase,type,start,end,distance,phrase.length()));
+	                }
 	        	}
 	        }
 		}
@@ -145,10 +138,12 @@ public class NER {
 	 * It assumes the ID attributes is the first one of every line and the title or name comes second
 	 */
 	private void loadDictionaryFromFile(){
-		File songsFile = new File(this.songsFile);
+		//File songsFile = new File(this.songsFile);
 		File artistsFile = new File(this.artistsFile);
 		File releasesFile = new File(this.releasesFile);
-		String[] songs = null;
+		MapDictionary<String> dictionaryExact = new MapDictionary<String>();
+		TrieDictionary<String>dictionaryApprox = new TrieDictionary<String>();
+		//String[] songs = null;
 		String[] artists = null;
 		String[] releases = null;
 		try{
@@ -162,7 +157,7 @@ public class NER {
 		//*** ASSUMING TAB SEPARATED FILES AND THE NAMES ARE LOCATED IN THE SECOND VALUE ON THE FILES
 		
 		//add all the song titles to the dictionary
-		if(songs != null){
+		/*if(songs != null){
 			for(String song : songs){
 				//int f = song.indexOf("\t");
 				//int i = song.indexOf("\t", f);
@@ -172,7 +167,7 @@ public class NER {
 				dictionaryExact.addEntry(new DictionaryEntry<String>(title,"SONG",CHUNK_SCORE));
 				dictionaryApprox.addEntry(new DictionaryEntry<String>(title,"SONG"));
 			}
-		}
+		}*/
 		
 		//add all the artist names to the dictionary
 		if(artists != null){
@@ -209,6 +204,9 @@ public class NER {
 		Connection conn = getConnection();
 		Statement stmt = null;
 		ResultSet rs = null;
+		MapDictionary<String> dictionaryExact = new MapDictionary<String>();
+		//this.dictionaryExact = new MapDictionary<String>();
+		//this.dictionaryApprox = new TrieDictionary<String>();
 		
 		/** artists **/
 		try {
@@ -218,7 +216,6 @@ public class NER {
 		    	String val = rs.getString("title");
 		    	val = val.substring(0,val.length()-1);
 		    	dictionaryExact.addEntry(new DictionaryEntry<String>(val,"ARTIST",CHUNK_SCORE));
-				dictionaryApprox.addEntry(new DictionaryEntry<String>(val,"ARTIST"));
 		    }
 		}
 		catch (SQLException ex){
@@ -240,7 +237,7 @@ public class NER {
 		        stmt = null;
 		    }
 		}
-		
+		System.out.println("finished artists");
 		
 		/** releases **/
 		try {
@@ -250,7 +247,6 @@ public class NER {
 		    	String val = rs.getString("title");
 		    	val = val.substring(0,val.length()-1);
 		    	dictionaryExact.addEntry(new DictionaryEntry<String>(val,"RELEASE",CHUNK_SCORE));
-				dictionaryApprox.addEntry(new DictionaryEntry<String>(val,"RELEASE"));
 		    }
 		}
 		catch (SQLException ex){
@@ -272,6 +268,14 @@ public class NER {
 		        stmt = null;
 		    }
 		}
+		System.out.println("finished releases");
+		this.dictionaryChunkerExact = new ExactDictionaryChunker(dictionaryExact, IndoEuropeanTokenizerFactory.INSTANCE, true,false);
+		System.out.println("finished chunckers");
+		try {
+			conn.close();
+		} catch (SQLException e) {
+		}
+		
 	}
 	
 	public Connection getConnection(){
@@ -285,16 +289,28 @@ public class NER {
 		return conn;
 	}
 	
+	/*
 	public static void main(String args[]){
-		String q = "Pearl Jam is an artist, Queen is an artist as well, Crystal Starr Knighton is another artist, \"One Night At The Opra\" is a release but \"Bohemian Rhapsody\" is a song";
+		String q2 = "\"Pearl Jam\" is an artist, Queen is an artist as well, crystal starr knighton is another artist, One Night At The Opera is a release but \"Bohemian Rhapsody\" is a song";
+		String q = "Crystal Starr Knighton \"One Night At The Station\"";
 		NER n = new NER();
-		ArrayList<Annotation> nes = n.annotateQuery(q);
+		//n.trainModel();
+		ArrayList<Annotation> nes;
+		nes = n.annotateQuery(q);
 		Iterator<Annotation> it = nes.iterator();
 		System.out.println("Query: "+q);
 		while(it.hasNext()){
 			Annotation a = it.next();
 			System.out.println(a.getEntityValue() + "\t" + a.getEntityType());
 		}
-	}
+		
+		nes = n.annotateQuery(q2);
+		Iterator<Annotation> it2 = nes.iterator();
+		System.out.println("Query: "+q);
+		while(it2.hasNext()){
+			Annotation a = it2.next();
+			System.out.println(a.getEntityValue() + "\t" + a.getEntityType());
+		}
+	}*/
 
 }

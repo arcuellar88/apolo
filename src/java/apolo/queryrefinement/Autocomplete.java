@@ -2,7 +2,6 @@ package apolo.queryrefinement;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystem;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -10,10 +9,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedSet;
-
-import com.aliasi.dict.DictionaryEntry;
 import com.aliasi.io.FileLineReader;
 import com.aliasi.spell.AutoCompleter;
 import com.aliasi.spell.FixedWeightEditDistance;
@@ -194,6 +192,30 @@ public class Autocomplete {
 		} catch (SQLException ex) {
 		}
 		return conn;
+	}
+	
+	public static void main(String a[]){
+		Autocomplete ac = new Autocomplete();
+		String q2 = "Pear";
+		String q = "One Nigh";
+		//n.trainModel();
+		ArrayList<String> comp;
+		System.out.println("load finished");
+		comp = ac.getCompletionsList(q);
+		Iterator<String> it = comp.iterator();
+		System.out.println("Query: "+q);
+		while(it.hasNext()){
+			String rs = it.next();
+			System.out.println(rs);
+		}
+		
+		ArrayList<String> comp2 = ac.getCompletionsList(q2);
+		Iterator<String> it2 = comp2.iterator();
+		System.out.println("Query: "+q2);
+		while(it2.hasNext()){
+			String rs = it2.next();
+			System.out.println(rs);
+		}
 	}
 
 }
