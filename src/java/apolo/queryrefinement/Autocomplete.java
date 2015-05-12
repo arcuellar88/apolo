@@ -22,7 +22,7 @@ public class Autocomplete {
 	private String songsFile;
 	private String artistsFile;
 	private String releasesFile;
-	private Map<String,Integer> dictionary;
+	//private Map<String,Integer> dictionary;
 	private double matchWeight;
 	private double insertWeight;
 	private double substituteWeight;
@@ -40,8 +40,8 @@ public class Autocomplete {
 		this.songsFile = fullpath + "songs.txt";
 		this.artistsFile = fullpath + "artists.txt";
 		this.releasesFile = fullpath + "releases.txt";
-		this.dictionary = new HashMap<String,Integer>(15000000);
-		loadDictionaryFromDB();
+		Map<String,Integer> dictionary = loadDictionaryFromDB();
+		//loadDictionaryFromFile();
 		this.matchWeight = 0.0;
         this.insertWeight = -10.0;
         this.substituteWeight = -10.0;
@@ -54,7 +54,8 @@ public class Autocomplete {
         completer = new AutoCompleter(dictionary, editDistance, maxResults, maxQueueSize, minScore);
 	}
 	
-	private void loadDictionaryFromFile(){
+	private Map<String,Integer> loadDictionaryFromFile(){
+		Map<String,Integer> dictionary = new HashMap<String,Integer>(1000000);
 		File songsFile = new File(this.songsFile);
 		File artistsFile = new File(this.artistsFile);
 		File releasesFile = new File(this.releasesFile);
@@ -101,6 +102,7 @@ public class Autocomplete {
 				dictionary.put(name, 2); //2 is for RELEASE
 			}
 		}
+		return dictionary;
 	}
 	
 	public ArrayList<String> getCompletionsList(String input){
@@ -116,7 +118,8 @@ public class Autocomplete {
 	 * Loads the songs, artists and releases to the dictionary.
 	 * It uses the existing DB table to obtain all songs, artists and release names.
 	 */
-	private void loadDictionaryFromDB(){
+	private Map<String, Integer> loadDictionaryFromDB(){
+		Map<String,Integer> dictionary = new HashMap<String,Integer>(1000000);
 		Connection conn = getConnection();
 		Statement stmt = null;
 		ResultSet rs = null;
@@ -151,7 +154,7 @@ public class Autocomplete {
 		    }
 		}
 		
-		
+		System.out.println("finished artists");
 		/** releases **/
 		try {
 		    stmt = conn.createStatement();
@@ -181,7 +184,7 @@ public class Autocomplete {
 		        stmt = null;
 		    }
 		}
-		
+		System.out.println("finished releases");
 		/** songs **/
 		/*
 		try {
@@ -215,6 +218,7 @@ public class Autocomplete {
 		    }
 		}
 		*/
+		return dictionary;
 	}
 	
 	public Connection getConnection(){
@@ -229,8 +233,10 @@ public class Autocomplete {
 	}
 	/*
 	public static void main(String a[]){
+		System.out.println("Starting Autocomplete");
 		Autocomplete ac = new Autocomplete();
-		String q2 = "Ten Years";
+		System.out.println("Autocomplete instance created");
+		/*String q2 = "Ten Years";
 		String q = "One Nigh";
 		String q3 = "Pearl";
 		ArrayList<String> comp;
