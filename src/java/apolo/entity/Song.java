@@ -18,6 +18,8 @@ public class Song extends RankingItem implements ISong{
 	private String rating;
 	private int ratingType;
 	private Date releaseDate;
+	private String description;
+	private String URI;
 	
 	//Features
 	
@@ -52,6 +54,12 @@ public class Song extends RankingItem implements ISong{
 		this.key_value = key_value;
 		this.mode_value = mode_value;
 	}
+	
+	
+	public Song() {
+		// Empty Artists
+	}
+
 	
 	// --------------------------------------------------------
 	// Getters and Setters
@@ -135,5 +143,26 @@ public class Song extends RankingItem implements ISong{
 	public void setMode_value(double mode_value) {
 		this.mode_value = mode_value;
 	}
+	
+	
+	public void setDescription(String description)
+	{
+		this.description=description;
+	}
+	public String getDescription()
+	{
+		return description;
+	}
+	
+	public String getURI() {
+		return URI;
+	}
+
+
+	public void setURI(String uRI) {
+		URI = uRI;
+	}
+	
+	
 	
 }

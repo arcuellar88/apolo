@@ -35,4 +35,9 @@ public interface ISong {
 	public void setKey_value(double key_value);
 	public double getMode_value();
 	public void setMode_value(double mode_value);
+	public void setDescription(String description);
+	public String getDescription();
+	public void setURI(String textContent);
+	public String getURI();
+	
 }
