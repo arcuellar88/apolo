@@ -4,8 +4,8 @@ import java.util.HashMap;
 
 import apolo.querybuilder.ArtistReleaseDataPreparation;
 
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field;
@@ -17,6 +17,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.util.Version;
 
 
 
@@ -38,7 +39,7 @@ public class Indexer {
     /** Gets index writer */
     public IndexWriter getIndexWriter() throws IOException {
         if (indexWriter == null) {
-            IndexWriterConfig config = new IndexWriterConfig(analyzer);
+            IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_46, analyzer);
             indexWriter = new IndexWriter(indexDir, config);
         }
         return indexWriter;
@@ -197,7 +198,7 @@ public class Indexer {
       try {
 
           // configure index properties
-        EnglishAnalyzer analyzer = new EnglishAnalyzer();  
+         Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_46);
           Directory indexDir = new RAMDirectory();
         
           long start = System.currentTimeMillis();       
