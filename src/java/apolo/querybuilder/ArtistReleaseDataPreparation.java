@@ -98,8 +98,8 @@ while ((line = br.readLine()) != null) {
             String line;
        
             
-    while ((line = br.readLine()) != null) {
-       
+     //while ((line = br.readLine()) != null) {
+         line = br.readLine();
             HashMap<String, String> releaseMap = new HashMap<String, String>();
             
             if (line != null ){
@@ -132,13 +132,20 @@ while ((line = br.readLine()) != null) {
                     else
                         releaseMap.put("releaseSongID", "0");
                 
-
+                System.out.println(  releaseMap.get("releaseID"));
+                System.out.println(  releaseMap.get("releaseName"));
+                System.out.println(  releaseMap.get("releaseArtist"));
+                System.out.println(  releaseMap.get("releaseMBID"));
+                System.out.println(  releaseMap.get("releaseSong"));
+                System.out.println(  releaseMap.get("releaseSongID"));
+                
+                System.out.println( "----------------");
                 releaseList.add(releaseMap);
                 
             }
                
               
-     }
+   //    }
             br.close();
             
         }
