@@ -11,7 +11,8 @@ public class ArtistReleaseDataPreparation {
     /**
      * For song extraction
      */
-    public final String releaseFile = "data/Exp_File_3.txt";
+    
+  
     public final String artistFile = "data/artist1.csv";
     public  final List<HashMap<String, String>> artistList = new ArrayList<HashMap<String, String>>();
     public  final List<HashMap<String, String>> releaseList = new ArrayList<HashMap<String, String>>();
@@ -20,19 +21,19 @@ public class ArtistReleaseDataPreparation {
     public final static String INDEX_SEPARATOR1 = "\\[\\|\\]";
     public final static String INDEX_SEPARATOR2 = "\\{";
    
-  /*
+ 
  public static void main(String[] args) throws IOException {
         
         ArtistReleaseDataPreparation dp = new ArtistReleaseDataPreparation();
         
         long start = System.currentTimeMillis();
      // dp.readArtist();
-      dp.readRelease();
+      // dp.readRelease();
      
-        System.out.println(" Done..loaded_IN: " + (System.currentTimeMillis() - start));
+        System.out.println(" Done..loaded_IN: " + (System.currentTimeMillis() - start)  );
         
     
-    } */
+    }
  
  
     
@@ -88,52 +89,59 @@ while ((line = br.readLine()) != null) {
 
     
     public void readRelease() throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(releaseFile));
-        String line;
-   
+            
         
- while ((line = br.readLine()) != null) {
-   
-        HashMap<String, String> releaseMap = new HashMap<String, String>();
-        
-        if (line != null ){
-            String[] txt = line.split(INDEX_SEPARATOR2);
+        for (int file =1 ; file <= 5 ; file++) {
             
+           String  releaseFile =  "data/Exp_File_"+ file+ ".txt";
+            BufferedReader br = new BufferedReader(new FileReader(releaseFile));
+            String line;
+       
+            
+    while ((line = br.readLine()) != null) {
+       
+            HashMap<String, String> releaseMap = new HashMap<String, String>();
+            
+            if (line != null ){
+                String[] txt = line.split(INDEX_SEPARATOR2);
+                
 
-            releaseMap.put("releaseID", txt[0]);
-            releaseMap.put("releaseName", txt[1]);
-            releaseMap.put("releaseType", txt[2]);
-            releaseMap.put("releaseMBID", txt[3]);
-            
-            if(txt.length>=5  && txt[4] !="")
-            releaseMap.put("releaseArtist", txt[4]);
-            else
-                releaseMap.put("releaseArtist", "");
-            
+                releaseMap.put("releaseID", txt[0]);
+                releaseMap.put("releaseName", txt[1]);
+                releaseMap.put("releaseType", txt[2]);
+                releaseMap.put("releaseMBID", txt[3]);
+                
+                if(txt.length>=5  && txt[4] !="")
+                releaseMap.put("releaseArtist", txt[4]);
+                else
+                    releaseMap.put("releaseArtist", "");
+                
 
-            if(txt.length>=6  && txt[5] !="")
-            releaseMap.put("releaseArtistID", txt[5]);
-            else
-                releaseMap.put("releaseArtistID", "0");
-            
-            if(txt.length>=7  && txt[6] !="")
-                releaseMap.put("releaseSong", txt[6]);
+                if(txt.length>=6  && txt[5] !="")
+                releaseMap.put("releaseArtistID", txt[5]);
                 else
-                    releaseMap.put("releaseSong", "");
-            
-            if(txt.length>=8  && txt[7] !="")
-                releaseMap.put("releaseSongID", txt[7]);
-                else
-                    releaseMap.put("releaseSongID", "0");
-                     
-           
-            releaseList.add(releaseMap);
+                    releaseMap.put("releaseArtistID", "0");
+                
+                if(txt.length>=7  && txt[6] !="")
+                    releaseMap.put("releaseSong", txt[6]);
+                    else
+                        releaseMap.put("releaseSong", "");
+                
+                if(txt.length>=8  && txt[7] !="")
+                    releaseMap.put("releaseSongID", txt[7]);
+                    else
+                        releaseMap.put("releaseSongID", "0");
+                
+
+                releaseList.add(releaseMap);
+                
+            }
+               
+              
+     }
+            br.close();
             
         }
-           
-          
+        }
+         
     }
-        br.close();
-    }
-
-}
