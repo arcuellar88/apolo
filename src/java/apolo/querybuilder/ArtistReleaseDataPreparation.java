@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import java.util.HashMap;
 import java.util.List;
 
@@ -12,31 +11,28 @@ public class ArtistReleaseDataPreparation {
     /**
      * For song extraction
      */
-    public final String releaseFile = "data/release.csv";
-    public final String artistFile = "data/artist.csv";
-    public final String releaseSongFile = "data/releaseSong.csv";
+    public final String releaseFile = "data/Exp_File_3.txt";
+    public final String artistFile = "data/artist1.csv";
     public  final List<HashMap<String, String>> artistList = new ArrayList<HashMap<String, String>>();
     public  final List<HashMap<String, String>> releaseList = new ArrayList<HashMap<String, String>>();
     public  final List<HashMap<String, String>> releaseSongList = new ArrayList<HashMap<String, String>>();
 
-    public final String separator = ",";
-    public final String separator2 = "\\|";
-    public final String separator3 = "@";
+    public final static String INDEX_SEPARATOR1 = "\\[\\|\\]";
+    public final static String INDEX_SEPARATOR2 = "\\{";
    
-    
-    
+  /*
  public static void main(String[] args) throws IOException {
         
         ArtistReleaseDataPreparation dp = new ArtistReleaseDataPreparation();
         
         long start = System.currentTimeMillis();
-        // dp.readArtist();
-       dp.readRelease();
+     // dp.readArtist();
+      dp.readRelease();
      
         System.out.println(" Done..loaded_IN: " + (System.currentTimeMillis() - start));
         
     
-    }
+    } */
  
  
     
@@ -45,14 +41,14 @@ public class ArtistReleaseDataPreparation {
         String line;
         
         
- while ((line = br.readLine()) != null) {
-     
+while ((line = br.readLine()) != null) {
+
      HashMap<String, String> artistMap = new HashMap<String, String>();
         
          if (line != null ){ 
           
-            String[] txt = line.split(separator2);
-                    
+            String[] txt = line.split(INDEX_SEPARATOR1);
+            
             artistMap.put("artistID", txt[0]);
             artistMap.put("artistName", txt[1]);
             artistMap.put("artistGender", txt[2]);
@@ -83,8 +79,7 @@ public class ArtistReleaseDataPreparation {
                 artistMap.put("artistMBID", txt[11]);
                 else
                 artistMap.put("artistMBID","0");
-            
-
+               
             artistList.add(artistMap);
         }
  }
@@ -97,12 +92,12 @@ public class ArtistReleaseDataPreparation {
         String line;
    
         
-  while ((line = br.readLine()) != null) {
+ while ((line = br.readLine()) != null) {
    
         HashMap<String, String> releaseMap = new HashMap<String, String>();
         
         if (line != null ){
-            String[] txt = line.split(separator3);
+            String[] txt = line.split(INDEX_SEPARATOR2);
             
 
             releaseMap.put("releaseID", txt[0]);
@@ -130,13 +125,14 @@ public class ArtistReleaseDataPreparation {
                 releaseMap.put("releaseSongID", txt[7]);
                 else
                     releaseMap.put("releaseSongID", "0");
-            
+                     
+           
             releaseList.add(releaseMap);
             
         }
            
           
-     }
+    }
         br.close();
     }
 
