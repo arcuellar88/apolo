@@ -10,5 +10,9 @@ public interface IRelease {
 	public String getType();
 	public void setName(String name);
 	public void setType(String type);
+	public void setDescription(String description);
+	public String getDescription();
+	public void setURI(String textContent);
+	public String getURI();
 	
 }

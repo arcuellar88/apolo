@@ -20,7 +20,12 @@ public class Release extends RankingItem implements IRelease{
 	 */
 	private String type;
 	
+	private String description;
+	private String URI;
 	
+	public Release() {
+		// Empty Artists
+	}
 	
 	// --------------------------------------------------------
 	// Methods
@@ -45,6 +50,22 @@ public class Release extends RankingItem implements IRelease{
 		this.type = type;
 	}
 	
+	public void setDescription(String description)
+	{
+		this.description=description;
+	}
+	public String getDescription()
+	{
+		return description;
+	}
 	
+	public String getURI() {
+		return URI;
+	}
+
+
+	public void setURI(String uRI) {
+		URI = uRI;
+	}
 	
 }

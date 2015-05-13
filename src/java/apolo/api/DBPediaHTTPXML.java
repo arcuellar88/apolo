@@ -29,6 +29,9 @@ public class DBPediaHTTPXML implements IDBpedia {
 	private final static String QUERY_STRING="QUERYSTR";
 	private final static String CLASS_ARTIST="Agent";
 
+	private final static String CLASS_Song="Song";
+	private final static String CLASS_RELEASE="Album";
+	
 	
 	// --------------------------------------------------------
 	// Attributes
@@ -82,16 +85,67 @@ public class DBPediaHTTPXML implements IDBpedia {
 	}
 	
 	public ISong getAdditionalInformationSong(ISong s) {
-		// TODO Auto-generated method stub
-		return null;
+    
+		Element root=httpRequestDBPedia(CLASS_Song, s.getTitle());
+		
+		if(root!=null)
+		{
+			// get all child nodes
+	        NodeList nodes = root.getChildNodes();
+	        
+	        if(nodes.getLength()>0)
+	        	{
+	        	Node nodo2=nodes.item(1); 
+	        	 nodes = nodo2.getChildNodes();
+	 	        
+	 	        for (int i = 0; i < nodes.getLength(); i++) {
+	 	        	
+	 		            //Log.println("Name: " + nodes.item(i).getNodeName()+" Value:"+nodes.item(i).getTextContent());
+	 		        //Look for the description    
+	 	        	if(nodes.item(i).getNodeName().equals("Description"))
+	 		            	s.setDescription(nodes.item(i).getTextContent().trim());
+	 	        	if(nodes.item(i).getNodeName().equals("URI"))
+ 		            	s.setURI(nodes.item(i).getTextContent());
+	 	       }
+		 	       
+	        	}  
+	        
+		}        
+        
+		return s;
 	}
 
 	@Override
 	public IRelease getAdditionalInformationRelease(IRelease r) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+Element root=httpRequestDBPedia(CLASS_RELEASE, r.getName());
+		
+		if(root!=null)
+		{
+			// get all child nodes
+	        NodeList nodes = root.getChildNodes();
+	        
+	        if(nodes.getLength()>0)
+	        	{
+	        	Node nodo2=nodes.item(1); 
+	        	 nodes = nodo2.getChildNodes();
+	 	        
+	 	        for (int i = 0; i < nodes.getLength(); i++) {
+	 	        	
+	 		            //Log.println("Name: " + nodes.item(i).getNodeName()+" Value:"+nodes.item(i).getTextContent());
+	 		        //Look for the description    
+	 	        	if(nodes.item(i).getNodeName().equals("Description"))
+	 		            	r.setDescription(nodes.item(i).getTextContent().trim());
+	 	        	if(nodes.item(i).getNodeName().equals("URI"))
+ 		            	r.setURI(nodes.item(i).getTextContent());
 
+	 	        }
+	 	       
+	        	}  
+	        
+		}        
+        
+		return r;
+	}
 	
 	/**
 	 * Methods that transforms the HTTP GET request into a DOM element
@@ -187,10 +241,21 @@ public class DBPediaHTTPXML implements IDBpedia {
 	{
 		IDBpedia db= new DBPediaHTTPXML();
 		//db.printHttpRequest();
-		IArtist a = new Artist();
-		a.setName("Shakira");
+		/*IArtist a = new Artist();
+		a.setName("shakira");
 		db.getAdditionalInformationArtist(a);
-		Log.println("Description" + a.getDescription());
+		Log.println("Description: " + a.getDescription());*/
+		
+	/*	ISong s = new Song();
+		s.setTitle("Brave");
+		db.getAdditionalInformationSong(s);
+		Log.println("Description: " + s.getDescription());
+		*/
+		
+		IRelease r = new Release();
+		r.setName("Brave");
+		db.getAdditionalInformationRelease(r);
+		Log.println("Description: " + r.getDescription());
 		
 	}
 }
