@@ -25,6 +25,14 @@
     
     <!-- jQuery 2.1.3 -->
     <script src="${resource(dir: 'js', file: 'plugins/jQuery/jQuery-2.1.3.min.js')}" type="text/javascript"></script>
+    
+    <script src="${resource(dir: 'js', file: 'scripts.js')}" type="text/javascript"></script>
+    
+    <!-- Google chart -->
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+   		google.load('visualization', '1.0', {'packages':['corechart']});
+    </script>
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->

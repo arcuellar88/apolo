@@ -67,6 +67,7 @@ public class SongIndexer implements IIndexer {
 				if (fv.length > 1) {
 					value = fv[1];
 				}
+				value = value.replaceAll("\\u00a0", " ").trim();
 				
 				//Check int field
 				if (checkIntValueField(field)) {
@@ -172,7 +173,6 @@ public class SongIndexer implements IIndexer {
 	 */
 	
 	public static void main(String[] args) throws IOException {
-		
 		String indexFolder = "indexfiles";
 		String indexDirectory = "index";
 		
