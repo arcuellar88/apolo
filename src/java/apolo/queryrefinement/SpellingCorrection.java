@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import apolo.msc.Global_Configuration;
+
 import com.aliasi.lm.NGramProcessLM;
 import com.aliasi.spell.CompiledSpellChecker;
 import com.aliasi.spell.FixedWeightEditDistance;
@@ -47,7 +49,8 @@ public class SpellingCorrection {
     	tokenizerFactory = new com.aliasi.tokenizer.LowerCaseTokenizerFactory(IndoEuropeanTokenizerFactory.INSTANCE);
     	sc = new TrainSpellChecker(lm,fixedEdit,tokenizerFactory);
     	String path = System.getProperty("user.dir");
-		String fullpath = path + File.separator + "src" + File.separator + "java" + File.separator + "apolo" + File.separator + "queryrefinement" + File.separator;
+		//String fullpath = path + File.separator + "src" + File.separator + "java" + File.separator + "apolo" + File.separator + "queryrefinement" + File.separator;
+    	String fullpath = Global_Configuration.DATA_FOLDER;
 		this.songsFile = fullpath + "songs.txt";
 		this.artistsFile = fullpath + "artists.txt";
 		this.releasesFile = fullpath + "releases.txt";

@@ -32,4 +32,9 @@ public class Global_Configuration
 	public final static String INDEX_DELIMITER = "\\[\\|\\]";
 	public final static String INDEX_DIRECTORY = "index";
 	
+	// --------------------------------------------------------
+	// OTHER
+	// --------------------------------------------------------
+	
+	public final static String DATA_FOLDER = "data";
 }
