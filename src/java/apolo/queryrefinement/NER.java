@@ -113,15 +113,17 @@ public class NER {
 	        	String text = it.next();
 	        	Chunking chunking = dictionaryChunkerExact.chunk(text);
 	        	for (Chunk chunk : chunking.chunkSet()) {
-	        		int start = chunk.start();
-	                int end = chunk.end();
-	                String type = chunk.type();
-	                double distance = chunk.score();
-	                String phrase = chunking.charSequence().subSequence(start,end).toString();
-	                //System.out.println(phrase);
-	                if(phrase.length()>1){
-	                	annotations.add(new Annotation(phrase,type,start,end,distance,phrase.length()));
-	                }
+	        		if(addAnnotation(chunk, chunking, text)){
+		        		int start = chunk.start();
+		                int end = chunk.end();
+		                String type = chunk.type();
+		                double distance = chunk.score();
+		                String phrase = chunking.charSequence().subSequence(start,end).toString();
+		                //System.out.println(phrase);
+		                if(phrase.length()>1){
+		                	annotations.add(new Annotation(phrase,type,start,end,distance,phrase.length()));
+		                }
+	        		}
 	        	}
 	        }
 		}
@@ -287,6 +289,24 @@ public class NER {
 		} catch (SQLException ex) {
 		}
 		return conn;
+	}
+	
+	private boolean addAnnotation(Chunk chunk1, Chunking chunking, String t){
+		boolean add=true;
+		String c1 = getString(chunk1);
+		for (Chunk chunk2 : chunking.chunkSet()) {
+			String c2 = getString(chunk2);
+			if(c2.contains(c1) && !c2.equals(c1)){
+				add=false;
+			}
+		}
+		return add;
+	}
+	
+	private String getString(Chunk chunk){
+		int start = chunk.start();
+        int end = chunk.end();
+		return this.query.substring(start,end);
 	}
 	
 	/*
