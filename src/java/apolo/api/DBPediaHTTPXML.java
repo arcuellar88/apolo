@@ -27,10 +27,17 @@ public class DBPediaHTTPXML implements IDBpedia {
 	private final static String HTTP_URL = "http://lookup.dbpedia.org/api/search.asmx/KeywordSearch?QueryClass=QCLASS&QueryString=QUERYSTR";
 	private final static String QUERY_CLASS="QCLASS";
 	private final static String QUERY_STRING="QUERYSTR";
-	private final static String CLASS_ARTIST="Agent";
-
-	private final static String CLASS_Song="Song";
+	private final static String CLASS_ARTIST="Artist";
+	private final static String CLASS_BAND="Band";
+	private final static String CLASS_AGENT="Agent";
+	private final static String CLASS_SONG="Song";
 	private final static String CLASS_RELEASE="Album";
+	private final static String CLASS_MUSIC="MusicalWork";
+	
+	private static String Defult_Desc = "";
+	private static String Defult_URI = "";
+	
+	
 	
 	
 	// --------------------------------------------------------
@@ -54,98 +61,75 @@ public class DBPediaHTTPXML implements IDBpedia {
 	@Override
 	public IArtist getAdditionalInformationArtist(IArtist a)
 	{
-		Element root=httpRequestDBPedia(CLASS_ARTIST, a.getName());
+		String name =  a.getName().replaceAll(" ", "_");
+		httpRequestDBPedia(CLASS_ARTIST,name);
 		
-		if(root!=null)
+		if (  (!Defult_Desc.equals("EMPTY..")  && !Defult_URI.equals("EMPTY.."))){
+     		a.setDescription(Defult_Desc);
+     		a.setURI(Defult_URI);
+     	}
+		
+		else
 		{
-			// get all child nodes
-	        NodeList nodes = root.getChildNodes();
-	        
-	        if(nodes.getLength()>0)
-	        	{
-	        	Node nodo2=nodes.item(1); 
-	        	 nodes = nodo2.getChildNodes();
-	 	        
-	 	        for (int i = 0; i < nodes.getLength(); i++) {
-	 	        	
-	 		            //Log.println("Name: " + nodes.item(i).getNodeName()+" Value:"+nodes.item(i).getTextContent());
-	 		        //Look for the description    
-	 	        	if(nodes.item(i).getNodeName().equals("Description"))
-	 		            	a.setDescription(nodes.item(i).getTextContent().trim());
-	 	        	if(nodes.item(i).getNodeName().equals("URI"))
- 		            	a.setURI(nodes.item(i).getTextContent());
-
-	 	        }
-	 	       
-	        	}  
-	        
-		}        
-        
+			
+			httpRequestDBPedia(CLASS_BAND,name);
+			
+			if (  (Defult_Desc.equals("EMPTY..")  && Defult_URI.equals("EMPTY.."))){
+				httpRequestDBPedia(CLASS_AGENT,name);	     	
+	     	}
+			a.setDescription(Defult_Desc);
+     		a.setURI(Defult_URI);
+			
+		}
+		
 		return a;
 	}
 	
 	public ISong getAdditionalInformationSong(ISong s) {
     
-		Element root=httpRequestDBPedia(CLASS_Song, s.getTitle());
 		
-		if(root!=null)
+		String name = s.getTitle().replaceAll(" ", "_");
+		httpRequestDBPedia(CLASS_SONG,name);
+		
+		if (  (!Defult_Desc.equals("EMPTY..")  && !Defult_URI.equals("EMPTY.."))){
+     		s.setDescription(Defult_Desc);
+     		s.setURI(Defult_URI);
+     	}
+		
+		else
 		{
-			// get all child nodes
-	        NodeList nodes = root.getChildNodes();
-	        
-	        if(nodes.getLength()>0)
-	        	{
-	        	Node nodo2=nodes.item(1); 
-	        	 nodes = nodo2.getChildNodes();
-	 	        
-	 	        for (int i = 0; i < nodes.getLength(); i++) {
-	 	        	
-	 		            //Log.println("Name: " + nodes.item(i).getNodeName()+" Value:"+nodes.item(i).getTextContent());
-	 		        //Look for the description    
-	 	        	if(nodes.item(i).getNodeName().equals("Description"))
-	 		            	s.setDescription(nodes.item(i).getTextContent().trim());
-	 	        	if(nodes.item(i).getNodeName().equals("URI"))
- 		            	s.setURI(nodes.item(i).getTextContent());
-	 	       }
-		 	       
-	        	}  
-	        
-		}        
-        
+			
+			httpRequestDBPedia(CLASS_MUSIC,name);
+			s.setDescription(Defult_Desc);
+     		s.setURI(Defult_URI);
+			
+		}
 		return s;
 	}
 
 	@Override
 	public IRelease getAdditionalInformationRelease(IRelease r) {
-Element root=httpRequestDBPedia(CLASS_RELEASE, r.getName());
-		
-		if(root!=null)
-		{
-			// get all child nodes
-	        NodeList nodes = root.getChildNodes();
-	        
-	        if(nodes.getLength()>0)
-	        	{
-	        	Node nodo2=nodes.item(1); 
-	        	 nodes = nodo2.getChildNodes();
-	 	        
-	 	        for (int i = 0; i < nodes.getLength(); i++) {
-	 	        	
-	 		            //Log.println("Name: " + nodes.item(i).getNodeName()+" Value:"+nodes.item(i).getTextContent());
-	 		        //Look for the description    
-	 	        	if(nodes.item(i).getNodeName().equals("Description"))
-	 		            	r.setDescription(nodes.item(i).getTextContent().trim());
-	 	        	if(nodes.item(i).getNodeName().equals("URI"))
- 		            	r.setURI(nodes.item(i).getTextContent());
-
-	 	        }
-	 	       
-	        	}  
-	        
-		}        
         
+		String name = r.getName().replaceAll(" ", "_");
+		httpRequestDBPedia(CLASS_RELEASE,name);
+		
+		if (  (!Defult_Desc.equals("EMPTY..")  && !Defult_URI.equals("EMPTY.."))){
+     		r.setDescription(Defult_Desc);
+     		r.setURI(Defult_URI);
+     	}
+		
+		else
+		{
+			
+			httpRequestDBPedia(CLASS_MUSIC,name);
+			r.setDescription(Defult_Desc);
+     		r.setURI(Defult_URI);
+			
+		}
+		
 		return r;
 	}
+	
 	
 	/**
 	 * Methods that transforms the HTTP GET request into a DOM element
@@ -153,7 +137,7 @@ Element root=httpRequestDBPedia(CLASS_RELEASE, r.getName());
 	 * @param name Name of the entity: of the artist, song or release
 	 * @return The root element of the response from DBPedia
 	 */
-	public Element httpRequestDBPedia(String qClass,String name)
+	public void httpRequestDBPedia(String qClass,String name)
 	{
 		Element root=null;
 		try {
@@ -176,6 +160,39 @@ Element root=httpRequestDBPedia(CLASS_RELEASE, r.getName());
 
 	         // get the first element
 	         root = doc.getDocumentElement();
+	         // read from root
+	 		if(root!=null)
+			{
+				// get all child nodes
+		        NodeList nodes = root.getChildNodes();
+		        
+		        if(nodes.getLength()>0)
+		        	{
+		        	Node nodo2=nodes.item(1); 
+		        	
+		        	 if(nodo2 != null){
+		        		 
+		        	 nodes = nodo2.getChildNodes();
+		        	
+		 	        for (int i = 0; i < nodes.getLength(); i++) {
+		 	            
+		 		        //Look for the description  & URI
+		 	        	if(nodes.item(i).getNodeName().equals("Description"))
+		 	        		Defult_Desc= nodes.item(i).getTextContent().trim();
+		 	        	
+		 	        	if(nodes.item(i).getNodeName().equals("URI"))
+		 	        		Defult_URI=nodes.item(i).getTextContent();
+       
+		 	        	
+		 	  
+		 	        }	}
+		        	 
+		        	 else
+		        	 {   Defult_Desc = "EMPTY..";
+		        	     Defult_URI = "EMPTY..";
+		        	 }
+		        	}  	}   
+		 	       	         
 
 			} 
 			catch (ClientProtocolException e) {
@@ -191,8 +208,7 @@ Element root=httpRequestDBPedia(CLASS_RELEASE, r.getName());
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		
-		 return root;
+	
 	}
 	
 	
@@ -240,22 +256,29 @@ Element root=httpRequestDBPedia(CLASS_RELEASE, r.getName());
 	public static void main(String[] args)
 	{
 		IDBpedia db= new DBPediaHTTPXML();
-		//db.printHttpRequest();
+	
 		/*IArtist a = new Artist();
-		a.setName("shakira");
+		a.setName("Kim Kardashian");
 		db.getAdditionalInformationArtist(a);
-		Log.println("Description: " + a.getDescription());*/
-		
-	/*	ISong s = new Song();
-		s.setTitle("Brave");
+		Log.println("Description: " + a.getDescription() + "\n"+ a.getURI());*/
+
+	
+		ISong s = new Song();
+		s.setTitle("Yellow Submarine");
 		db.getAdditionalInformationSong(s);
-		Log.println("Description: " + s.getDescription());
-		*/
+		Log.println("Description: " + s.getDescription() + "\n"+ s.getURI());
+
 		
+		
+		/* 
+		 
 		IRelease r = new Release();
 		r.setName("Brave");
 		db.getAdditionalInformationRelease(r);
-		Log.println("Description: " + r.getDescription());
+		Log.println("Description: " + r.getDescription()+ "\n"+ r.getURI());  
+		
+		*/
 		
 	}
 }
+
