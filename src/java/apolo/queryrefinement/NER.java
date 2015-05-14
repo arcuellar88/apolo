@@ -162,12 +162,7 @@ public class NER {
 				lines = FileLineReader.readLineArray(files.get(m),"UTF-8");
 				if(lines != null){
 					for(String elem : lines){
-						//int f = artist.indexOf("\t");
-						//int i = artist.indexOf("\t", f);
-			            //if (i < 0) continue;
-			            //String name = artist.substring(f+1,i);
-						String name = elem;
-						dictionaryExact.addEntry(new DictionaryEntry<String>(name,"ARTIST",CHUNK_SCORE));
+						dictionaryExact.addEntry(new DictionaryEntry<String>(elem,"ARTIST",CHUNK_SCORE));
 						//dictionaryApprox.addEntry(new DictionaryEntry<String>(name,"ARTIST"));
 					}
 				}

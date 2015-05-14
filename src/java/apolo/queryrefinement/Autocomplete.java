@@ -66,11 +66,7 @@ public class Autocomplete {
 				lines = FileLineReader.readLineArray(files.get(m),"UTF-8");
 				if(lines != null){
 					for(String elem : lines){
-						//int f = elem.indexOf("\t");
-						//int i = elem.indexOf("\t", f);
-			            //if (i < 0) continue;
-			            String title = elem;
-						dictionary.put(title, 2); //0 is for SONG
+						dictionary.put(elem, 2); //0 is for SONG
 					}
 				}
 			}
