@@ -162,6 +162,7 @@ public class NER {
 				lines = FileLineReader.readLineArray(files.get(m),"UTF-8");
 				if(lines != null){
 					for(String elem : lines){
+						String name = elem;
 						dictionaryExact.addEntry(new DictionaryEntry<String>(elem,"ARTIST",CHUNK_SCORE));
 						//dictionaryApprox.addEntry(new DictionaryEntry<String>(name,"ARTIST"));
 					}
@@ -223,7 +224,7 @@ public class NER {
 		}
 		
 		System.out.println("finished loading dictionary");
-		this.dictionaryChunkerExact = new ExactDictionaryChunker(dictionaryExact, IndoEuropeanTokenizerFactory.INSTANCE, true,false);
+		this.dictionaryChunkerExact = new ExactDictionaryChunker(dictionaryExact, IndoEuropeanTokenizerFactory.INSTANCE, false,false);
 		System.out.println("finished chunckers");
 		try {
 			conn.close();
@@ -284,5 +285,5 @@ public class NER {
 			System.out.println(a.getEntityValue() + "\t" + a.getEntityType());
 		}
 	}
-	 */
+	*/
 }
