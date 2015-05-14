@@ -50,7 +50,7 @@ public class SpellingCorrection {
     	sc = new TrainSpellChecker(lm,fixedEdit,tokenizerFactory);
     	String path = System.getProperty("user.dir");
 		//String fullpath = path + File.separator + "src" + File.separator + "java" + File.separator + "apolo" + File.separator + "queryrefinement" + File.separator;
-    	String fullpath = Global_Configuration.DATA_FOLDER;
+    	String fullpath = Global_Configuration.DATA_FOLDER + File.separator;
 		this.songsFile = fullpath + "songs.txt";
 		this.artistsFile = fullpath + "artists.txt";
 		this.releasesFile = fullpath + "releases.txt";

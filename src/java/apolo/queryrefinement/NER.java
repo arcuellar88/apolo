@@ -3,6 +3,8 @@ package apolo.queryrefinement;
 import java.util.*;
 import java.io.*;
 
+import apolo.msc.Global_Configuration;
+
 import com.aliasi.chunk.Chunk;
 import com.aliasi.chunk.Chunking;
 import com.aliasi.dict.DictionaryEntry;
@@ -11,6 +13,7 @@ import com.aliasi.dict.MapDictionary;
 import com.aliasi.dict.TrieDictionary;
 import com.aliasi.io.FileLineReader;
 import com.aliasi.tokenizer.IndoEuropeanTokenizerFactory;
+
 
 
 import java.sql.Connection;
@@ -33,7 +36,8 @@ public class NER {
 	public NER(){
 		this.query="";
 		String path = System.getProperty("user.dir");
-		String fullpath = path + File.separator + "src" + File.separator + "java" + File.separator + "apolo" + File.separator + "queryrefinement" + File.separator;
+		//String fullpath = path + File.separator + "src" + File.separator + "java" + File.separator + "apolo" + File.separator + "queryrefinement" + File.separator;
+		String fullpath = Global_Configuration.DATA_FOLDER + File.separator;
 		this.filenames = new ArrayList<String>();
 		this.filenames.add(fullpath + "artists.txt");
 		this.filenames.add(fullpath + "releases.txt");
@@ -237,8 +241,10 @@ public class NER {
 		Connection conn = null;
 		try {
 		    conn =
-		       DriverManager.getConnection("jdbc:mysql://localhost/apolo?" +
-		                                   "user=root&password=");
+		       DriverManager.getConnection("jdbc:mysql://localhost/" +
+					 					    Global_Configuration.MYSQL_DB + "?" +
+					                        "user=" + Global_Configuration.MYSQL_USER + 
+					                        "&password=" + Global_Configuration.MYSQL_PWD);
 		} catch (SQLException ex) {
 		}
 		return conn;
