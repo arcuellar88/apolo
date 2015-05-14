@@ -17,7 +17,7 @@ import org.apache.lucene.document.DateTools.Resolution;
 
 import apolo.msc.Global_Configuration;
 
-public class DataPreparation {
+public class SongDataPreparation {
 	/**
 	 * For song extraction
 	 */
@@ -55,7 +55,7 @@ public class DataPreparation {
 	
 	public static void main(String[] args) throws IOException {
 		
-		DataPreparation dp = new DataPreparation();
+		SongDataPreparation dp = new SongDataPreparation();
 		
 		long start = System.currentTimeMillis();
 		
