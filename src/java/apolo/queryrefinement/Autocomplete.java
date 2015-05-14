@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedSet;
+
+import apolo.msc.Global_Configuration;
+
 import com.aliasi.io.FileLineReader;
 import com.aliasi.spell.AutoCompleter;
 import com.aliasi.spell.FixedWeightEditDistance;
@@ -225,17 +228,21 @@ public class Autocomplete {
 		Connection conn = null;
 		try {
 		    conn =
-		       DriverManager.getConnection("jdbc:mysql://localhost/apolo?" +
-		                                   "user=root&password=");
+		       DriverManager.getConnection("jdbc:mysql://localhost/" +
+		    		   					    Global_Configuration.MYSQL_DB + "?" +
+		                                   "user=" + Global_Configuration.MYSQL_USER + 
+		                                   "&password=" + Global_Configuration.MYSQL_PWD);
 		} catch (SQLException ex) {
 		}
 		return conn;
 	}
+	
 	/*
 	public static void main(String a[]){
 		System.out.println("Starting Autocomplete");
 		Autocomplete ac = new Autocomplete();
 		System.out.println("Autocomplete instance created");
+		
 		/*String q2 = "Ten Years";
 		String q = "One Nigh";
 		String q3 = "Pearl";
@@ -264,6 +271,6 @@ public class Autocomplete {
 			String rs = it3.next();
 			System.out.println(rs);
 		}
-	}*/
-
+	}
+	*/
 }
