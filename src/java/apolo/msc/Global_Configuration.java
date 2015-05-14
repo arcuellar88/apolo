@@ -29,5 +29,7 @@ public class Global_Configuration
 	
 	//Do not trim spaces in INDEX_SEPARATOR, separator 
 	public final static String INDEX_SEPARATOR = " [|] ";
+	public final static String INDEX_DELIMITER = "\\[\\|\\]";
+	public final static String INDEX_DIRECTORY = "index";
 	
 }
