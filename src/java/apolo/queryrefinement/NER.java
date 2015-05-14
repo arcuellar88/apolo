@@ -271,7 +271,7 @@ public class NER {
 		    }
 		}
 		System.out.println("finished releases");
-		this.dictionaryChunkerExact = new ExactDictionaryChunker(dictionaryExact, IndoEuropeanTokenizerFactory.INSTANCE, true,false);
+		this.dictionaryChunkerExact = new ExactDictionaryChunker(dictionaryExact, IndoEuropeanTokenizerFactory.INSTANCE, false,false);
 		System.out.println("finished chunckers");
 		try {
 			conn.close();
