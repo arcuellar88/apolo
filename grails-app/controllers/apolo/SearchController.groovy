@@ -323,7 +323,7 @@ class SearchController extends BaseController {
 	
 	private ArrayList<ApoloDocument> getFirstArtistSongs(ApoloDocument artist) {
 		Searcher searcher = new Searcher(Global_Configuration.INDEX_DIRECTORY)
-		searcher.addQuery(artist.getDocumentID(), "documentID", Occur.MUST)
+		searcher.addQuery(artist.getArtistID(), "songArtistsID", Occur.MUST)
 		searcher.addQuery("song", "type", Occur.MUST)
 		return searcher.getResults()
 	}

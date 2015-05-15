@@ -60,7 +60,7 @@
 		       				<tr>
 		       					<td>${releaseSongCounter + 1}</td>
 		       					<td>
-		       						<a href="javascript:void(0)" class="load-document-id" entity-id="${releaseSongIDs.get(releaseSongCounter)}">${releaseSong}</a>
+		       						<a href="javascript:void(0)" class="load-document-id" entity-id="song_${releaseSongIDs.get(releaseSongCounter)}">${releaseSong}</a>
 		       					</td>
 		       				</tr>
 		       			</g:each>
