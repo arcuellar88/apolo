@@ -51,7 +51,7 @@ public class DWConnector {
 	public Artist getArtist(int artist_id) {
 		
 		// query="SELECT ROWNUM ROW_NUM, SUBQ.* FROM (select ARTIST_ID, ARTIST_NAME, ARTIST_TYPE, GENDER from  APOLO_MASTER.DIMARTIST) SUBQ DWHERE ROWNUM <= 75";
-		String query = "select ARTIST_ID, ARTIST_NAME, ARTIST_TYPE, GENDER from  APOLO_MASTER.DIMARTIST where artist_id=?";
+		String query = "select ARTIST_ID, ARTIST_NAME, ARTIST_TYPE, GENDER from  APOLO_MASTER.DIMARTIST where SID=?";
 		Artist artist=null;
 
 		try {

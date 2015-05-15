@@ -39,15 +39,17 @@ class SearchController extends BaseController {
 			query = params.keyword.trim()
 		}
 		
-		//Get spelling correction
-		String spellingCorrectedString = spellChecker.getSpellingSuggestions(query)
-		if (spellingCorrectedString.equalsIgnoreCase(query)) {
-			spellingCorrectedString = ""
-		}
-		
-		model.spellingCorrectedString = spellingCorrectedString
+		String spellingCorrectedString = ""
 		
 		if (!query.equals("")) {
+			
+			//Get spelling correction
+			spellingCorrectedString = spellChecker.getSpellingSuggestions(query)
+			
+			if (spellingCorrectedString.equalsIgnoreCase(query)) {
+				spellingCorrectedString = ""
+			}
+			
 			isSearching = true
 			
 			//init searcher for song
@@ -77,7 +79,7 @@ class SearchController extends BaseController {
 			for(Annotation anno : annotations) {
 				if (anno.getEntityType().equalsIgnoreCase("SONG")) {
 					//Main search
-					songSearcher.addQuery(anno.getEntityValue(), "songTitle", Occur.SHOULD, 2)
+					songSearcher.addQuery(anno.getEntityValue(), "songTitle", Occur.SHOULD, (float)2)
 					
 					//Additional information
 					releaseSearcher.addQuery(anno.getEntityValue(), "releaseSongs", Occur.SHOULD)
@@ -86,7 +88,7 @@ class SearchController extends BaseController {
 				}
 				else if (anno.getEntityType().equalsIgnoreCase("RELEASE")) {
 					//Main search
-					releaseSearcher.addQuery(anno.getEntityValue(), "releaseName", Occur.SHOULD, 2)
+					releaseSearcher.addQuery(anno.getEntityValue(), "releaseName", Occur.SHOULD, (float)2)
 					
 					//Additional information
 					songSearcher.addQuery(anno.getEntityValue(), "songReleaseName", Occur.SHOULD)
@@ -95,7 +97,7 @@ class SearchController extends BaseController {
 				}
 				else if (anno.getEntityType().equalsIgnoreCase("ARTIST")) {
 					//Main search
-					artistSearcher.addQuery(anno.getEntityValue(), "artistName", Occur.SHOULD, 2)
+					artistSearcher.addQuery(anno.getEntityValue(), "artistName", Occur.SHOULD, (float)2)
 					
 					//Additional information
 					releaseSearcher.addQuery(anno.getEntityValue(), "releaseArtists", Occur.SHOULD)
@@ -106,7 +108,7 @@ class SearchController extends BaseController {
 			
 			//Check if annotation for song/artist/release exist, if not we need to relax the query criteria
 			if (!existSongAnno) {
-				songSearcher.addQuery(query, "songTitle", Occur.SHOULD, 1.5)
+				songSearcher.addQuery(query, "songTitle", Occur.SHOULD, (float)1.5)
 				songSearcher.addQuery(query, "songLabels", Occur.SHOULD)
 				songSearcher.addQuery(query, "songLyrics", Occur.SHOULD)
 				songSearcher.addQuery(query, "songCountries", Occur.SHOULD)
@@ -114,22 +116,18 @@ class SearchController extends BaseController {
 			}
 			
 			if (!existReleaseAnno) {
-				releaseSearcher.addQuery(query, "releaseName", Occur.SHOULD, 1.5)
+				releaseSearcher.addQuery(query, "releaseName", Occur.SHOULD, (float)1.5)
 				releaseSearcher.addQuery(query, "releaseType", Occur.SHOULD)
 				releaseSearcher.addQuery(query, "releaseSongs", Occur.SHOULD)
 				releaseSearcher.addQuery(query, "releaseArtists", Occur.SHOULD)
-				releaseSearcher.setPage(1)
-				releaseSearcher.setResultPerPage(10)
 			}
 			
 			if (!existArtistAnno) {
-				artistSearcher.addQuery(query, "artistName", Occur.SHOULD, 1.5)
+				artistSearcher.addQuery(query, "artistName", Occur.SHOULD, (float)1.5)
 				artistSearcher.addQuery(query, "artistType", Occur.SHOULD)
 				artistSearcher.addQuery(query, "artistGender", Occur.SHOULD)
 				artistSearcher.addQuery(query, "artistCountry", Occur.SHOULD)
 				artistSearcher.addQuery(query, "artistContinent", Occur.SHOULD)
-				artistSearcher.setPage(1)
-				artistSearcher.setPage(10)
 			}
 			
 			//Execute query and get result
@@ -166,56 +164,71 @@ class SearchController extends BaseController {
 			
 			//Song
 			for(ApoloDocument song : songs) {
-				ISong isong = new Song()
 				
-				isong.setTitle(song.getSongTitle())
-				//TODO: Set more information to get correct information
-				
-				dbpediaClient.getAdditionalInformationSong(isong)
-				song.setIsong(isong)
-				
-				//TODO Next Phase: To update the index with information crawl from DBpedia
-				
-				//Only get for the first one
+				try {
+					ISong isong = new Song()
+					
+					isong.setTitle(song.getSongTitle())
+					//TODO: Set more information to get correct information
+					
+					dbpediaClient.getAdditionalInformationSong(isong)
+					song.setIsong(isong)
+					
+					//TODO Next Phase: To update the index with information crawl from DBpedia
+					
+					//Only get for the first one
+				} catch (Exception e) {
+					e.printStackTrace()
+				}
 				break
 			}
 			
 			//Release
 			for(ApoloDocument release : releases) {
-				IRelease irelease = new Release()
-				
-				irelease.setName(release.getReleaseName())
-				irelease.setType(release.getReleaseType())
-				//TODO: Set more information to get correct information
-				
-				dbpediaClient.getAdditionalInformationRelease(irelease)
-				release.setIrelease(irelease)
-				
-				//TODO Next Phase: To update the index with information crawl from DBpedia
-				
-				//Only get for the first one
+				try {
+					IRelease irelease = new Release()
+					
+					irelease.setName(release.getReleaseName())
+					irelease.setType(release.getReleaseType())
+					//TODO: Set more information to get correct information
+					
+					dbpediaClient.getAdditionalInformationRelease(irelease)
+					release.setIrelease(irelease)
+					
+					//TODO Next Phase: To update the index with information crawl from DBpedia
+					
+					//Only get for the first one
+				} catch (Exception e) {
+					e.printStackTrace()
+				}
 				break
 			}
 			
 			//Artist
 			for(ApoloDocument artist : artists) {
-				IArtist iartist = new Artist()
-				
-				iartist.setGender(artist.getArtistGender())
-				iartist.setName(artist.getArtistName())
-				//TODO: Set more information to get correct information
-				
-				dbpediaClient.getAdditionalInformationArtist(iartist)
-				artist.setIartist(iartist)
-				
-				//TODO Next Phase: To update the index with information crawl from DBpedia
-				
-				//Only get for the first one
+				try {
+					IArtist iartist = new Artist()
+					
+					iartist.setGender(artist.getArtistGender())
+					iartist.setName(artist.getArtistName())
+					//TODO: Set more information to get correct information
+					
+					dbpediaClient.getAdditionalInformationArtist(iartist)
+					artist.setIartist(iartist)
+					
+					//TODO Next Phase: To update the index with information crawl from DBpedia
+					
+					//Only get for the first one
+				} catch (Exception e) {
+					e.printStackTrace()
+				}
 				break
 			}
 		}
 		
+		model.spellingCorrectedString = spellingCorrectedString
 		model.isSearching = isSearching
+		
 		render (view : "search" , layout : "main" , model : model);
 	}
 	
@@ -240,12 +253,17 @@ class SearchController extends BaseController {
 		
 		if (entity.getType().equalsIgnoreCase("song")) {
 			//Song
-			ISong isong = new Song()
 			
-			isong.setTitle(entity.getSongTitle())
-			dbpediaClient.getAdditionalInformationSong(isong)
-			
-			entity.setIsong(isong)
+			try {
+				ISong isong = new Song()
+				
+				isong.setTitle(entity.getSongTitle())
+				dbpediaClient.getAdditionalInformationSong(isong)
+				
+				entity.setIsong(isong)
+			} catch (Exception e) {
+				e.printStackTrace()
+			}
 			
 			//Youtube link
 			String youtubeURL = getYouTubeURL(entity)
@@ -330,6 +348,7 @@ class SearchController extends BaseController {
 			newItem.setType("artist")
 			newItem.setArtistID(rartists.getItems().get(i).getItemId() + "")
 			newItem.setArtistName(rartists.getItems().get(i).getItemName())
+			newItem.setDocumentID("artist_" + rartists.getItems().get(i).getItemId())
 			recommendedItems.add(newItem)
 		}
 		

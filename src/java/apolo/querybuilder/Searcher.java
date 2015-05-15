@@ -73,6 +73,7 @@ public class Searcher implements ISearcher {
 	public void addQuery(String keyword , String searchField, Occur occur, float boostingScore) throws Exception {
 		String escapeKeyword =  QueryParser.escape(keyword);
 		Query query = new QueryParser(Version.LUCENE_46, searchField, analyzer).parse(escapeKeyword.toLowerCase());
+		query.setBoost(boostingScore);
 		booleanQuery.add(query, occur);
 	}
 	
