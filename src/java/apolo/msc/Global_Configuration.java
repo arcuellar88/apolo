@@ -33,8 +33,14 @@ public class Global_Configuration
 	public final static String INDEX_DIRECTORY = "index";
 	
 	// --------------------------------------------------------
+	// YOUTUBE
+	// --------------------------------------------------------
+		
+	public final static String YOUTUBE_KEY = "";
+	
+	// --------------------------------------------------------
 	// OTHER
 	// --------------------------------------------------------
 	
-	public final static String DATA_FOLDER = "data";
+	public final static String DATA_FOLDER = "D:/workspace/apolo/data";
 }

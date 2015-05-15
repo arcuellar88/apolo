@@ -46,6 +46,7 @@ public class Recommender implements IRecommender {
 	 */
 	public Recommender() {
 		dataModel = null;
+		initialize(Global_Configuration.MYSQL);
 	}
 
 	// --------------------------------------------------------
@@ -60,6 +61,7 @@ public class Recommender implements IRecommender {
 		try {
 			// MYSQL
 			if (database.equals(Global_Configuration.MYSQL)) {
+				
 				MysqlDataSource dataSource = new MysqlDataSource();
 				dataSource.setServerName(Global_Configuration.MYSQL_HOST);
 				dataSource.setUser(Global_Configuration.MYSQL_USER);
@@ -75,7 +77,7 @@ public class Recommender implements IRecommender {
 
 				// Initialize data model
 				dataModel = new ReloadFromJDBCDataModel(new MySQLJDBCDataModel(
-						dataSource, "taste_preferences2", "user_id", "item_id",
+						dataSource, "taste_preferences", "user_id", "item_id",
 						"preference", ""));
 				
 			} else {
@@ -94,7 +96,7 @@ public class Recommender implements IRecommender {
 						"FK_DIMUSER", "FK_DIMARTIST", "RATING", ""));
 			}
 
-			Log.println("Datamodel initialized");
+			//Log.println("Datamodel initialized");
 
 		} catch (TasteException e) {
 			e.printStackTrace();
@@ -106,11 +108,9 @@ public class Recommender implements IRecommender {
 	}
 
 	@Override
-	public IRanking getRecommendation(IArtist a, int numRecommendations) {
-
-		initialize(Global_Configuration.MYSQL);
-
-		IRanking r = getRecommendationNoPreCompute(a.getArtist_id(),
+	public Ranking getRecommendation(IArtist a, int numRecommendations) {
+		//initialize(Global_Configuration.MYSQL);
+		Ranking r = getRecommendationNoPreCompute(a.getArtist_id(),
 				numRecommendations);
 
 		return r;
@@ -122,11 +122,11 @@ public class Recommender implements IRecommender {
 	 * @param numRecommendations Number of recommendations for the requested artist
 	 * @return
 	 */
-	public IRanking getRecommendationNoPreCompute(int artistID,
+	public Ranking getRecommendationNoPreCompute(int artistID,
 			int numRecommendations) {
-
+		
 		// Initialize empty recommendation Ranking
-		IRanking ranking = new Ranking();
+		Ranking ranking = new Ranking();
 
 		try {
 
@@ -136,13 +136,15 @@ public class Recommender implements IRecommender {
 			// Create Recommender
 			GenericItemBasedRecommender recommender = new GenericItemBasedRecommender(
 					dataModel, simCache);
-			Log.println("Recommender created");
+			//Log.println("Recommender created");
 
 			// Get recommended artists
 			List<RecommendedItem> recommendations = recommender
 					.mostSimilarItems(artistID, numRecommendations);
-
-			Log.println("Initialize connection to DWH");
+			
+			System.out.println("MOST SIMILAR: " + recommendations.size());
+			
+			//Log.println("Initialize connection to DWH");
 			DWConnector dw = new DWConnector();
 
 			for (RecommendedItem recommendedItem : recommendations) {
@@ -151,17 +153,21 @@ public class Recommender implements IRecommender {
 				if (ri != null) {
 					ri.setItemType(RankingItem.TYPE_ARTIST);
 					ri.setSimilarity(recommendedItem.getValue());
+					ri.setItemId(recommendedItem.getItemID());
+					ri.setItemName(((Artist) ri).getName());
 					ranking.addRankingItem(ri);
+					/*
 					Log.println("Recommended Artists: "
 							+ ((IArtist) ri).getName() + " - "
 							+ ri.getSimilarity());
+					*/
 
 				} else
 					Log.println("Artist not found: "
 							+ recommendedItem.getItemID() + " - "
 							+ recommendedItem.getValue());
 			}
-			Log.println("Finish getRecommendationNoPreCompute" + new Date());
+			//Log.println("Finish getRecommendationNoPreCompute" + new Date());
 
 			dw.close();
 		} catch (NoSuchItemException e) {
@@ -201,7 +207,7 @@ public class Recommender implements IRecommender {
 				long itemId = items.nextLong();
 				List<RecommendedItem> recommendations = recommender
 						.mostSimilarItems(itemId, numSimilar);
-
+				
 				for (RecommendedItem recommendedItem : recommendations) {
 					Log.println(itemId + "," + recommendedItem.getItemID()
 							+ "," + recommendedItem.getValue());
@@ -274,9 +280,10 @@ public class Recommender implements IRecommender {
 
 		IArtist a = new Artist();
 
-		a.setArtist_id(4261880);
-		rd.getRecommendation(a, 5);
-		a.setArtist_id(4388813);
+		a.setArtist_id(4425485);
+		Ranking r = rd.getRecommendation(a, 5);
+		System.out.println("\n" + r.getItems().size());
+		a.setArtist_id(4425485);
 		rd.getRecommendation(a, 5);
 		
 		

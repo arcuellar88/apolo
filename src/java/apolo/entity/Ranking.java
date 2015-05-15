@@ -10,11 +10,17 @@ public class Ranking implements IRanking {
 	private ArrayList<IRankingItem> items;
 
 	
+	
 	public Ranking()
 	{
 		items= new ArrayList<IRankingItem>();
 	}
-	@Override
+	
+	
+	public void setItems(ArrayList<IRankingItem> items) {
+		this.items = items;
+	}
+	
 	public ArrayList<IRankingItem> getItems() {
 		return items;
 	}

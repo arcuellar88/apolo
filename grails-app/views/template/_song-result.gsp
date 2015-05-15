@@ -3,12 +3,12 @@
 													ArrayList<String> songArtists = song.getSplittedFields(song.songArtists);
 													ArrayList<String> songArtistIDs = song.getSplittedFields(song.songArtistsID);
        											%>
-						                    	<h4><a entity-id="${song.songID}" class="load-document-id" href="javascript:void(0)">${song.songTitle}</a></h4>
+						                    	<h4><a entity-id="${song.documentID}" class="load-document-id" href="javascript:void(0)">${song.songTitle}</a></h4>
 						                    	<div>
 						                    		Artist:
 						                    		<g:each in="${songArtists}" var="artist" status="artistCounter">
 						                    			<g:if test="${i>0}">,&nbsp;</g:if>
-						                    			<a entity-id="${songArtistIDs.get(artistCounter)}" class="load-document-id" href="javascript:void(0)">${artist}</a>
+						                    			<a entity-id="artist_${songArtistIDs.get(artistCounter)}" class="load-document-id" href="javascript:void(0)">${artist}</a>
 						                    		</g:each> 
 						                    	</div>
 						                    	<div>Duration:

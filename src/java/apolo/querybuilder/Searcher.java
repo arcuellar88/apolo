@@ -62,6 +62,21 @@ public class Searcher implements ISearcher {
 	}
 	
 	/**
+	 * Add query boosting score
+	 * @param keyword
+	 * @param searchField
+	 * @param occur
+	 * @param boostingScore
+	 * @throws Exception
+	 */
+	
+	public void addQuery(String keyword , String searchField, Occur occur, float boostingScore) throws Exception {
+		String escapeKeyword =  QueryParser.escape(keyword);
+		Query query = new QueryParser(Version.LUCENE_46, searchField, analyzer).parse(escapeKeyword.toLowerCase());
+		booleanQuery.add(query, occur);
+	}
+	
+	/**
 	 * Add a particular query to the current query
 	 * @param keyword
 	 * @param searchField
@@ -69,8 +84,9 @@ public class Searcher implements ISearcher {
 	 * @throws ParseException
 	 */
 	
-	public void addQuery(String keyword , String searchField, Occur occur) throws ParseException {
-		Query query = new QueryParser(Version.LUCENE_46, searchField, analyzer).parse(keyword.toLowerCase());
+	public void addQuery(String keyword , String searchField, Occur occur) throws Exception {
+		String escapeKeyword =  QueryParser.escape(keyword);
+		Query query = new QueryParser(Version.LUCENE_46, searchField, analyzer).parse(escapeKeyword.toLowerCase());
 		booleanQuery.add(query, occur);
 	}
 	
@@ -86,7 +102,7 @@ public class Searcher implements ISearcher {
 	 * @throws ParseException
 	 */
 	
-	public void addQuery(ArrayList<String> keywords , String searchField, Occur occur) throws ParseException {
+	public void addQuery(ArrayList<String> keywords , String searchField, Occur occur) throws Exception {
 		for (String keyword : keywords) {
 			addQuery(keyword, searchField, occur);
 		}
@@ -271,7 +287,7 @@ public class Searcher implements ISearcher {
 	public ApoloDocument getArtistDocument(Document doc) {
 		ApoloDocument artist = new ApoloDocument();
 		
-		artist.setArtistId(doc.get("artistID"));
+		artist.setArtistID(doc.get("artistID"));
 		artist.setArtistMBID(doc.get("artistMBID"));
 		artist.setArtistName(doc.get("artistName"));
 		artist.setArtistType(doc.get("artistType"));
@@ -356,8 +372,9 @@ public class Searcher implements ISearcher {
 			document = getArtistDocument(hitDoc);
 		}
 		
-		document.setDocumentId(hitDoc.get("documentId"));
+		document.setDocumentID(hitDoc.get("documentID"));
 		document.setTimestamp(hitDoc.get("timestamp"));
+		document.setType(hitDoc.get("type"));
 		
 		return document;
 	}

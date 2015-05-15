@@ -26,5 +26,11 @@ public interface IRankingItem {
 
 
 	public void setItemType(String type);
+
+	public long getItemId();
+	public void setItemId(long itemID);
+	
+	public String getItemName();
+	public void setItemName(String name);
 	
 }

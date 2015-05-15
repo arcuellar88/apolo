@@ -15,6 +15,8 @@ public abstract class RankingItem implements IRankingItem {
 
 	private String type;
 	private double similarity;
+	private long id;
+	private String name;
 
 	// --------------------------------------------------------
 	// Getters and Setters
@@ -42,6 +44,25 @@ public abstract class RankingItem implements IRankingItem {
 	public void setSimilarity(double sim) {
 		similarity=sim;
 		
+	}
+	
+	@Override
+	public long getItemId() {
+		return id;
+	}
+	
+	@Override
+	public void setItemId(long id) {
+		this.id = id;
+	}
+	
+	@Override
+	public String getItemName() {
+		return name;
+	}
+	
+	public void setItemName(String name) {
+		this.name = name;
 	}
 	
 }

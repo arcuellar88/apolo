@@ -1,6 +1,6 @@
 <%@page import="apolo.msc.Global_Configuration"%>
 <%@page import="apolo.entity.ApoloDocument"%>
-    	<div class="box">
+    	<div class="box box-success">
         	<div class="box-header with-border">
              	<h3 class="box-title"><strong>${song.songTitle}</strong></h3>
              	<div class="box-tools pull-right">
@@ -24,7 +24,7 @@
       							<g:if test="${i > 0}">
       								<br>
       							</g:if>
-      							<a entity-id="${songArtistIDs.get(i)}" class="load-document-id" href="javascript:void(0)">${artist}</a>
+      							<a entity-id="artist_${songArtistIDs.get(i)}" class="load-document-id" href="javascript:void(0)">${artist}</a>
        					</g:each>
        				</td>
     						</tr>
@@ -96,10 +96,23 @@
     					</table>
     				</div>
     	
-       	<div class="col-lg-6">
-       		<div class="youtube-wrapper">
-            		<iframe src="https://www.youtube.com/embed/pRpeEdMmmQ0" frameborder="0" allowfullscreen></iframe>
-            	</div>
+       		<div class="col-lg-6">
+       			<g:if test="${song.songYoutubeURL.equals("")}">
+       				<div class="alert alert-info alert-dismissable centered">
+                    	<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    	<h4 style="margin:0"><i class="icon fa fa-info"></i> We could find any related video.</h4>
+                  	</div>
+       			</g:if>
+       			<g:else>
+       				<h5 class="centered text-success" style="margin-top: 0">You might want to watch</h5>
+	       			<div class="youtube-wrapper">
+       					<div class="alert alert-info alert-dismissable centered">
+                    		<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    		<h4 style="margin:0"><i class="icon fa fa-info"></i> We could not find any video related to this song.</h4>
+                  		</div>
+       					<iframe src="${song.songYoutubeURL}" frameborder="0" allowfullscreen></iframe>
+	            	</div>
+            	</g:else>
            </div>
     			</div>
             	

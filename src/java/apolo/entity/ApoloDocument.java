@@ -11,7 +11,7 @@ import apolo.msc.Global_Configuration;
  */
 
 public class ApoloDocument {
-	String documentId;
+	String documentID;
 	String type = "";
 	String timestamp;
 	float luceneScore;
@@ -22,7 +22,7 @@ public class ApoloDocument {
 	
 	IArtist iartist = null;
 	
-	String artistId; //ID from DW
+	String artistID; //ID from DW
 	String artistMBID;
 	String artistName;
 	String artistType;
@@ -177,11 +177,11 @@ public class ApoloDocument {
 		this.releaseArtistID = releaseArtistID;
 	}
 
-	public String getDocumentId() {
-		return documentId;
+	public String getDocumentID() {
+		return documentID;
 	}
-	public void setDocumentId(String documentId) {
-		this.documentId = documentId;
+	public void setDocumentID(String documentId) {
+		this.documentID = documentId;
 	}
 	public String getType() {
 		return type;
@@ -201,11 +201,11 @@ public class ApoloDocument {
 	public void setIartist(IArtist iartist) {
 		this.iartist = iartist;
 	}
-	public String getArtistId() {
-		return artistId;
+	public String getArtistID() {
+		return artistID;
 	}
-	public void setArtistId(String artistId) {
-		this.artistId = artistId;
+	public void setArtistID(String artistId) {
+		this.artistID = artistId;
 	}
 	
 	public String getArtistMBID() {

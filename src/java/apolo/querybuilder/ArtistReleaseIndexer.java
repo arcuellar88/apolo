@@ -75,7 +75,7 @@ public class ArtistReleaseIndexer {
 		doc.add(new TextField("type", "artist", Field.Store.YES));
 		doc.add(new TextField("timestamp", DateTools.dateToString(Calendar
 				.getInstance().getTime(), Resolution.SECOND), Field.Store.YES));
-		doc.add(new TextField("documentId", "artist_" + artist.get("artistID"),
+		doc.add(new TextField("documentID", "artist_" + artist.get("artistID"),
 				Field.Store.YES));
 
 		doc.add(new TextField("artistID", artist.get("artistID"),
@@ -138,7 +138,7 @@ public class ArtistReleaseIndexer {
 
 		doc.add(new TextField("type", "release", Field.Store.YES));
 		doc.add(new TextField("timestamp", DateTools.dateToString(Calendar.getInstance().getTime(), Resolution.SECOND), Field.Store.YES));
-		doc.add(new TextField("documentId", "release_" + release.get("releaseID"), Field.Store.YES));
+		doc.add(new TextField("documentID", "release_" + release.get("releaseID"), Field.Store.YES));
 
 		doc.add(new TextField("releaseID", release.get("releaseID"), Field.Store.YES));
 		doc.add(new TextField("releaseName", release.get("releaseName"), Field.Store.YES));

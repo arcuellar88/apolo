@@ -67,7 +67,7 @@ public class DWConnector {
 				artist.setName(rs.getString("ARTIST_NAME"));
 				artist.setType(rs.getString("ARTIST_TYPE"));
 
-				Log.print(artist.toString());
+				//Log.print(artist.toString());
 			}
 
 		} catch (Exception e) {

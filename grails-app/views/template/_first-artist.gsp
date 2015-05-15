@@ -66,10 +66,10 @@
       			<g:if test="${artist.artistNumberOfRating != Integer.MAX_VALUE}">
       				<script type="text/javascript">
       					$(document).ready(function(){
-      						drawRatingPieChart(${artist.artistNumberOfPositiveRating}, ${artist.artistNumberOfNeutralRating}, ${artist.artistNumberOfNegativeRating}, "rating-chart-${artist.documentId}")
+      						drawRatingPieChart(${artist.artistNumberOfPositiveRating}, ${artist.artistNumberOfNeutralRating}, ${artist.artistNumberOfNegativeRating}, "rating-chart-${artist.documentID}")
           				});
       				</script>
-      				<div id="rating-chart-${artist.documentId}"></div>
+      				<div id="rating-chart-${artist.documentID}"></div>
       			</g:if>
       			<g:else>
       				<img style="width: 100%;" src="http://placehold.it/600x300&text=Artist rating is not available"/>
@@ -87,7 +87,7 @@
 	        			<g:if test="${artistSong != null}">
 		        			<tr>
 		        				<td>
-		        					<a href="javascript:void(0)" class="load-document-id" entity-id="${artistSong.songID}">${artistSong.songTitle}</a>
+		        					<a href="javascript:void(0)" class="load-document-id" entity-id="${artistSong.documentID}">${artistSong.songTitle}</a>
 		        				</td>
 		        			</tr>
 	        			</g:if>
