@@ -19,6 +19,7 @@ public class Artist extends RankingItem implements IArtist {
 	private String gender;
 	private String country;
 	private String description;
+	private String thumbnail;
 	private String URI;
 	
 	//DBPedia
@@ -125,6 +126,13 @@ public class Artist extends RankingItem implements IArtist {
 	}
 	
 	
+	public String getThumbnail() {
+		return thumbnail;
+	}
 
+
+	public void setThumbnail(String thumbnail) {
+		this.thumbnail = thumbnail;
+	}
 	
 }

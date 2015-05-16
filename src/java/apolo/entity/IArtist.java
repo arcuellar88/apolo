@@ -19,6 +19,8 @@ public interface IArtist {
 	public void setGender(String gender);
 	public String getCountry();
 	public void setCountry(String country);
+	public String getThumbnail();
+	public void setThumbnail(String thumbnail);
 	
 	// --------------------------------------------------------
 	// Methods

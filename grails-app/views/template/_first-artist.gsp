@@ -46,7 +46,12 @@
 	       	</div>
        	
 	       	<div class="col-lg-6" style="text-align: center;">
-	     		<img style="max-height: 200px; border: 4px solid #DDD;" src="http://placehold.it/150x200&text=Artist Image from DBPedia if available"/>
+	       		<g:if test="${artist.iartist != null && artist.iartist.thumbnail != null}">
+	       			<img style="max-height: 200px; border: 4px solid #DDD;" src="${artist.iartist.thumbnail}"/>
+	       		</g:if>
+	       		<g:else>
+	       			<img style="max-height: 200px; border: 4px solid #DDD;" src="http://placehold.it/150x200&text=Artist Image from DBPedia if available"/>
+	       		</g:else>
 	        </div>
        </div>
        
@@ -76,16 +81,18 @@
       			</g:else>
       		</div>
        
-        <div class="col-lg-6">
+        <div class="col-lg-6" style="max-height: 200px; overflow: auto;">
         	<g:if test="${firstArtistSongs.size() > 0}">
 	        	<table class="table">
 	        		<tr>
+	        			<th>#</th>
 	        			<th>Songs of ${artist.artistName}</th>
 	        		</tr>
 	        		
-	        		<g:each in="${firstArtistSongs} var="artistSong" status="songArtistCounter">
+	        		<g:each in="${firstArtistSongs}" var="artistSong" status="songArtistCounter">
 	        			<g:if test="${artistSong != null}">
 		        			<tr>
+		        				<td>${songArtistCounter + 1}</td>
 		        				<td>
 		        					<a href="javascript:void(0)" class="load-document-id" entity-id="${artistSong.documentID}">${artistSong.songTitle}</a>
 		        				</td>

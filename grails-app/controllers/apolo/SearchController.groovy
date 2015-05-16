@@ -3,6 +3,7 @@ package apolo
 import org.apache.lucene.search.BooleanClause.Occur;
 
 import apolo.api.DBPediaHTTPXML;
+import apolo.api.DPPediaHTTPSPARQL
 import apolo.api.IDBpedia;
 import apolo.api.YouTubeAPI
 import apolo.entity.ApoloDocument
@@ -160,70 +161,18 @@ class SearchController extends BaseController {
 			
 			long start = System.currentTimeMillis();
 			//Get additional information for  songs/releases/artists from DP pedia
-			IDBpedia dbpediaClient = new DBPediaHTTPXML();
 			
-			//Song
-			for(ApoloDocument song : songs) {
-				
-				try {
-					ISong isong = new Song()
-					
-					isong.setTitle(song.getSongTitle())
-					//TODO: Set more information to get correct information
-					
-					dbpediaClient.getAdditionalInformationSong(isong)
-					song.setIsong(isong)
-					
-					//TODO Next Phase: To update the index with information crawl from DBpedia
-					
-					//Only get for the first one
-				} catch (Exception e) {
-					e.printStackTrace()
-				}
-				break
+			if (songs.size() > 0) {
+				getDBPediaInfo(songs.get(0))
 			}
 			
-			//Release
-			for(ApoloDocument release : releases) {
-				try {
-					IRelease irelease = new Release()
-					
-					irelease.setName(release.getReleaseName())
-					irelease.setType(release.getReleaseType())
-					//TODO: Set more information to get correct information
-					
-					dbpediaClient.getAdditionalInformationRelease(irelease)
-					release.setIrelease(irelease)
-					
-					//TODO Next Phase: To update the index with information crawl from DBpedia
-					
-					//Only get for the first one
-				} catch (Exception e) {
-					e.printStackTrace()
-				}
-				break
+			if (releases.size() > 0) {
+				getDBPediaInfo(releases.get(0))
 			}
 			
-			//Artist
-			for(ApoloDocument artist : artists) {
-				try {
-					IArtist iartist = new Artist()
-					
-					iartist.setGender(artist.getArtistGender())
-					iartist.setName(artist.getArtistName())
-					//TODO: Set more information to get correct information
-					
-					dbpediaClient.getAdditionalInformationArtist(iartist)
-					artist.setIartist(iartist)
-					
-					//TODO Next Phase: To update the index with information crawl from DBpedia
-					
-					//Only get for the first one
-				} catch (Exception e) {
-					e.printStackTrace()
-				}
-				break
-			}
+			if (artists.size() > 0) {
+				getDBPediaInfo(artists.get(0))
+			} 
 		}
 		
 		model.spellingCorrectedString = spellingCorrectedString
@@ -249,22 +198,9 @@ class SearchController extends BaseController {
 		
 		ApoloDocument entity = searcher.getResults().get(0)
 		
-		IDBpedia dbpediaClient = new DBPediaHTTPXML();
+		getDBPediaInfo(entity)
 		
 		if (entity.getType().equalsIgnoreCase("song")) {
-			//Song
-			
-			try {
-				ISong isong = new Song()
-				
-				isong.setTitle(entity.getSongTitle())
-				dbpediaClient.getAdditionalInformationSong(isong)
-				
-				entity.setIsong(isong)
-			} catch (Exception e) {
-				e.printStackTrace()
-			}
-			
 			//Youtube link
 			String youtubeURL = getYouTubeURL(entity)
 			entity.setSongYoutubeURL(youtubeURL)
@@ -274,15 +210,6 @@ class SearchController extends BaseController {
 			data = g.render(template : "/template/first-song" , model : model);
 		}
 		else if (entity.getType().equalsIgnoreCase("artist")) {
-			//Artist
-			IArtist iartist = new Artist()
-			
-			iartist.setGender(entity.getArtistGender())
-			iartist.setName(entity.getArtistName())
-			
-			dbpediaClient.getAdditionalInformationArtist(iartist)
-			entity.setIartist(iartist)
-			
 			
 			model.firstArtistSongs = getFirstArtistSongs(entity)
 			model.recommendedArtists = getRecommendation(entity)
@@ -293,14 +220,6 @@ class SearchController extends BaseController {
 			
 		} 
 		else if (entity.getType().equalsIgnoreCase("release")) {
-			//Release
-			IRelease irelease = new Release()
-			
-			irelease.setName(entity.getReleaseName())
-			irelease.setType(entity.getReleaseType())
-			
-			dbpediaClient.getAdditionalInformationRelease(irelease)
-			entity.setIrelease(irelease)
 			
 			model.releaseSongs = entity.getSplittedFields(entity.releaseSongs);
 			model.releaseSongIDs = entity.getSplittedFields(entity.releaseSongIDs);
@@ -325,6 +244,8 @@ class SearchController extends BaseController {
 		Searcher searcher = new Searcher(Global_Configuration.INDEX_DIRECTORY)
 		searcher.addQuery(artist.getArtistID(), "songArtistsID", Occur.MUST)
 		searcher.addQuery("song", "type", Occur.MUST)
+		searcher.setPage(1)
+		searcher.setResultPerPage(100)
 		searcher.execute()
 		return searcher.getResults()
 	}
@@ -393,6 +314,41 @@ class SearchController extends BaseController {
 		} catch (Exception e) {
 			e.printStackTrace()
 			return ""
+		}
+	}
+	
+	private getDBPediaInfo(ApoloDocument document) {
+		
+		IDBpedia dbpediaClient = new DBPediaHTTPXML();
+		IDBpedia dbpediaSPARQLClient = new DPPediaHTTPSPARQL();
+		
+		if (document.getType().equalsIgnoreCase("song")) {
+			ISong isong = new Song()
+			
+			isong.setTitle(document.getSongTitle())
+			dbpediaClient.getAdditionalInformationSong(isong)
+			
+			document.setIsong(isong)
+		} else if (document.getType().equalsIgnoreCase("artist")) {
+		
+			//Artist
+			IArtist iartist = new Artist()
+			
+			iartist.setGender(document.getArtistGender())
+			iartist.setName(document.getArtistName())
+			
+			dbpediaSPARQLClient.getAdditionalInformationArtist(iartist)
+			document.setIartist(iartist)
+		
+		} else if (document.getType().equalsIgnoreCase("release")) {
+			//Release
+			IRelease irelease = new Release()
+			
+			irelease.setName(document.getReleaseName())
+			irelease.setType(document.getReleaseType())
+			
+			dbpediaClient.getAdditionalInformationRelease(irelease)
+			document.setIrelease(irelease)
 		}
 	}
 	
