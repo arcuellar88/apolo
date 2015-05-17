@@ -69,14 +69,11 @@ public class ApoloDocument {
 	String songContinents = "Asia,Europe"; //comma-separated string
 	
 	//Genre
-	String songGenres = "Pop,Rock"; //comma-seprated string
-	String songSubGenres; //comma-separated string
-	
-	//
-	String songGenreLinking = "";
+	String songGenres = "Pop,Rock"; //delimiter-seprated string
+	String songSubGenres; //delimiter-separated string
 	
 	//Label
-	String songLabel = ""; //comma-separated string
+	String songLabel = ""; //delimiter-separated string
 	
 	//Song date
 	String songDate; //String in the lucene format(so that can search in range). Need to check again new version 5.1.0 if it natively support time
@@ -92,21 +89,14 @@ public class ApoloDocument {
 	String songReleaseType;
 	String songReleaseMBID;
 	
+	//
+	int songTotalPlayCount;
 	
 	//Song artist
-	String songArtists = "Shakira,Bruno"; //commpa-separted
+	String songArtists = "Shakira,Bruno"; //delimiter-separted
 	String songArtistsID;
 	
-	//Option
-	String songArtistCountries; //comma-separated
-	String songArtistTypes; //comma-separated
-	String songArtistGenders; //comma-separated
-	
-	//How to index lyrics
 	String songLyrics;
-	
-	//Should we include the playcount here?
-	int songTotalPlayCount;
 	
 	/**
 	 * PROTOTYPE FOR RELEASE
@@ -400,12 +390,6 @@ public class ApoloDocument {
 	public void setSongSubGenres(String songSubGenres) {
 		this.songSubGenres = songSubGenres;
 	}
-	public String getSongGenreLinking() {
-		return songGenreLinking;
-	}
-	public void setSongGenreLinking(String songGenreLinking) {
-		this.songGenreLinking = songGenreLinking;
-	}
 	public String getSongLabel() {
 		return songLabel;
 	}
@@ -484,35 +468,11 @@ public class ApoloDocument {
 	public void setSongArtistsID(String songArtistIDs) {
 		this.songArtistsID = songArtistIDs;
 	}
-	public String getSongArtistCountries() {
-		return songArtistCountries;
-	}
-	public void setSongArtistCountries(String songArtistCountries) {
-		this.songArtistCountries = songArtistCountries;
-	}
-	public String getSongArtistTypes() {
-		return songArtistTypes;
-	}
-	public void setSongArtistTypes(String songArtistTypes) {
-		this.songArtistTypes = songArtistTypes;
-	}
-	public String getSongArtistGenders() {
-		return songArtistGenders;
-	}
-	public void setSongArtistGenders(String songArtistGenders) {
-		this.songArtistGenders = songArtistGenders;
-	}
 	public String getSongLyrics() {
 		return songLyrics;
 	}
 	public void setSongLyrics(String songLyrics) {
 		this.songLyrics = songLyrics;
-	}
-	public int getSongTotalPlayCount() {
-		return songTotalPlayCount;
-	}
-	public void setSongTotalPlayCount(int songTotalPlayCount) {
-		this.songTotalPlayCount = songTotalPlayCount;
 	}
 	public IRelease getIrelease() {
 		return irelease;
@@ -561,5 +521,13 @@ public class ApoloDocument {
 	}
 	public void setLuceneScore(float luceneScore) {
 		this.luceneScore = luceneScore;
+	}
+	
+	public int getSongTotalPlayCount() {
+		return songTotalPlayCount;
+	}
+
+	public void setSongTotalPlayCount(int songTotalPlayCount) {
+		this.songTotalPlayCount = songTotalPlayCount;
 	}
 }

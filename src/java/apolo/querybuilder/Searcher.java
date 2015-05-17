@@ -222,8 +222,6 @@ public class Searcher implements ISearcher {
 		song.setSongGenres(doc.get("songGenres"));
 		song.setSongSubGenres(doc.get("songSubGenres"));
 		
-		song.setSongGenreLinking(doc.get("songGenreLinking"));
-		
 		//Label
 		song.setSongLabel(doc.get("songLabel"));
 		
@@ -249,12 +247,14 @@ public class Searcher implements ISearcher {
 		song.setSongLyrics(doc.get("songLyrics"));
 		
 		//Should we include the playcount here?
+		/*
 		if (doc.get("songTotalPlayCount") != null) {
 			song.setSongTotalPlayCount(Integer.parseInt(doc.get("songTotalPlayCount")));
 		}
 		else {
 			song.setSongTotalPlayCount(Integer.MAX_VALUE);
 		}
+		*/
 		
 		return song;
 	}

@@ -42,10 +42,14 @@ class SearchController extends BaseController {
 		
 		String spellingCorrectedString = ""
 		
+		long start = System.currentTimeMillis()
+		
 		if (!query.equals("")) {
-			
+			println "\n\nKEYWORD: " + query
 			//Get spelling correction
 			spellingCorrectedString = spellChecker.getSpellingSuggestions(query)
+			println "SPELLING CORRECTION: " + ((System.currentTimeMillis() - start)) * 1.0 / 1000
+			start = System.currentTimeMillis()
 			
 			if (spellingCorrectedString.equalsIgnoreCase(query)) {
 				spellingCorrectedString = ""
@@ -70,6 +74,9 @@ class SearchController extends BaseController {
 			artistSearcher.addQuery("artist", "type", Occur.MUST)
 			artistSearcher.setPage(1)
 			artistSearcher.setResultPerPage(10)
+			
+			println "INIT SEARCHERS: " + ((System.currentTimeMillis() - start)) * 1.0 / 1000
+			start = System.currentTimeMillis()
 			
 			boolean existSongAnno = false
 			boolean existReleaseAnno = false
@@ -107,6 +114,9 @@ class SearchController extends BaseController {
 				}
 			}
 			
+			println "BUILD QUERY ANNOTATIONS: " + ((System.currentTimeMillis() - start)) * 1.0 / 1000
+			start = System.currentTimeMillis()
+			
 			//Check if annotation for song/artist/release exist, if not we need to relax the query criteria
 			if (!existSongAnno) {
 				songSearcher.addQuery(query, "songTitle", Occur.SHOULD, (float)1.5)
@@ -131,54 +141,82 @@ class SearchController extends BaseController {
 				artistSearcher.addQuery(query, "artistContinent", Occur.SHOULD)
 			}
 			
+			println "BUILD QUERY NO ANNOTATIONS: " + ((System.currentTimeMillis() - start)) * 1.0 / 1000
+			start = System.currentTimeMillis()
+			
 			//Execute query and get result
 			songSearcher.execute();
 			ArrayList<ApoloDocument> songs = songSearcher.getResults()
 			model.songs = songs
+			
+			println "RETRIEVE SONGS: " + ((System.currentTimeMillis() - start)) * 1.0 / 1000
+			start = System.currentTimeMillis()
 			
 			if (songs.size() > 0) {
 				String youtubeURL = getYouTubeURL(songs.get(0))
 				songs.get(0).setSongYoutubeURL(youtubeURL)
 			}
 			
+			println "YOUTUBE API: " + ((System.currentTimeMillis() - start)) * 1.0 / 1000
+			start = System.currentTimeMillis()
+			
 			releaseSearcher.execute();
 			ArrayList<ApoloDocument> releases = releaseSearcher.getResults()
 			model.releases = releases
+			
+			println "RETRIEVE RELEASES: " + ((System.currentTimeMillis() - start)) * 1.0 / 1000
+			start = System.currentTimeMillis()
 			
 			artistSearcher.execute();
 			ArrayList<ApoloDocument> artists = artistSearcher.getResults()
 			model.artists = artists
 			
+			println "RETRIEVE ARTISTS: " + ((System.currentTimeMillis() - start)) * 1.0 / 1000
+			start = System.currentTimeMillis()
+			
 			//Get song of the first artist
 			if (artists.size() > 0) {
 				model.firstArtistSongs = getFirstArtistSongs(artists.get(0))
-				model.recommendedArtists = getRecommendation(artists.get(0))
+				
+				println "RETRIEVE SONGS FOR FIRST ARTIST: " + ((System.currentTimeMillis() - start)) * 1.0 / 1000
+				start = System.currentTimeMillis()
 			}
 			else {
 				model.firstArtistSongs = new ArrayList<ApoloDocument>()
 				model.recommendedArtists = new ArrayList<ApoloDocument>()
 			}
 			
-			long start = System.currentTimeMillis();
 			//Get additional information for  songs/releases/artists from DP pedia
 			
 			if (songs.size() > 0) {
 				getDBPediaInfo(songs.get(0))
 			}
 			
+			println "DBPEDIA SONG: " + ((System.currentTimeMillis() - start)) * 1.0 / 1000
+			start = System.currentTimeMillis()
+			
 			if (releases.size() > 0) {
 				getDBPediaInfo(releases.get(0))
 			}
 			
+			println "DBPEDIA RELEASE: " + ((System.currentTimeMillis() - start)) * 1.0 / 1000
+			start = System.currentTimeMillis()
+			
 			if (artists.size() > 0) {
 				getDBPediaInfo(artists.get(0))
 			} 
+			
+			println "DBPEDIA ARTIST: " + ((System.currentTimeMillis() - start)) * 1.0 / 1000
+			start = System.currentTimeMillis()
 		}
 		
 		model.spellingCorrectedString = spellingCorrectedString
 		model.isSearching = isSearching
 		
 		render (view : "search" , layout : "main" , model : model);
+		
+		println "RENDER VIEW: " + ((System.currentTimeMillis() - start)) * 1.0 / 1000
+		start = System.currentTimeMillis()
 	}
 	
 	def getEntity() {
@@ -350,6 +388,28 @@ class SearchController extends BaseController {
 			dbpediaClient.getAdditionalInformationRelease(irelease)
 			document.setIrelease(irelease)
 		}
+	}
+	
+	/**
+	 * Get recommendation
+	 * @return
+	 */
+	
+	def getRecommendationArtist() {
+		
+		long start = System.currentTimeMillis()
+		
+		def model = [:]
+		String artistID = params.artistID
+		ApoloDocument document = new ApoloDocument()
+		document.setArtistID(artistID)
+		
+		model.recommendedArtists = getRecommendation(document)
+		
+		println "RETRIEVE RECOMMENDATION FOR FIRST ARTIST: " + ((System.currentTimeMillis() - start)) * 1.0 / 1000
+		start = System.currentTimeMillis()
+		
+		render(template : "/template/rartists" , model : model)
 	}
 	
 	/**

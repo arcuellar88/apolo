@@ -106,10 +106,24 @@
 			                  	<h3 class="box-title">You might be interested</h3>
 			                </div><!-- /.box-header -->
 			                
-			                <g:if test="${recommendedArtists.size() > 0}">
-				                <div class="box-body">
-				                 	<g:render template="/template/rartists" model="[recommendedArtists : recommendedArtists]"/>
+			                <g:if test="${artists.size() > 0}">
+				                <div class="box-body artist-recomendation-wrapper" artist-id="${artists.get(0).artistID}">
+				                	<div class="clearfix"></div>
+				                 	<div class="overlay centered" style="height: 30px; position: relative;"><i class="fa fa-circle-o-notch fa-spin"></i></div>
 				                </div><!-- /.box-body -->
+				                <script type="text/javascript">
+					                function initRecommendation() {
+					        			var artistID = $('.artist-recomendation-wrapper').attr("artist-id")
+					        			$.ajax({
+					        				url : "/apolo/search/getRecommendationArtist?artistID=" + artistID,
+					        				success: function(data) {
+					        					$('.artist-recomendation-wrapper').html(data);
+					        					initModalEntity();
+					        				}
+					        			});
+					        		}
+					                initRecommendation();
+				                </script>
 			                </g:if>
 	             		</div>
 	                </div>
@@ -151,7 +165,6 @@
         });
 			
 	  	$(document).ready(function(){
-			//$("#search").typeahead({ source: ["Shakira" , "songs of Shakira" , "Maroon 5"]});
 			$('ul.typeahead.dropdown-menu').css('width', $('#search').css('width'));
 			
 			$('#voice-search-btn').click(function(){
@@ -193,13 +206,13 @@
 
 		function initModalEntity() {
 			$('#entity-modal').modal({show : false})
-			$("a.load-document-id").click(function(e){
+			$("a.load-document-id").unbind('click').click(function(e){
 				var entityID = $(this).attr("entity-id")
 				$.ajax({
 					url : "/apolo/search/getEntity?entityID=" +entityID,
 					dataType: "json",
 					beforeSend: function() {
-						$('#entity-modal .modal-body').html('<div class="overlay"><i class="fa fa-refresh fa-spin"></i></div>');
+						$('#entity-modal .modal-body').html('<div class="overlay centered"><i class="fa fa-circle-o-notch fa-spin"></i></div>');
 						$('#entity-modal').modal('hide');
 						$('#entity-modal').modal('show');
 						$('#entity-modal .modal-title').html("Loading...");
