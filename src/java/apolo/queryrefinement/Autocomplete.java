@@ -94,6 +94,7 @@ public class Autocomplete {
 	 * It uses the existing DB table to obtain all songs, artists and release names.
 	 */
 	private void loadDictionaryFromDB(){
+		System.out.println("Start load of Autocomplete dictionary");
 		ArrayList<String> queries = new ArrayList<String>();
 		queries.add("SELECT title FROM artists_apolo");
 		queries.add("SELECT title FROM releases_apolo");
@@ -106,7 +107,7 @@ public class Autocomplete {
 		for(int i=0; i<queries.size(); i++){
 			executeAndAdd(queries.get(i), conn, stmt, rs);
 		}
-		
+		System.out.println("finished loading Autocomplete dictionary");
 	}
 	
 	private void executeAndAdd(String q, Connection conn, Statement stmt, ResultSet rs){

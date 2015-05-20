@@ -7,20 +7,29 @@ import apolo.msc.Global_Configuration;
 
 import com.aliasi.chunk.Chunk;
 import com.aliasi.chunk.Chunking;
+import com.aliasi.dict.ApproxDictionaryChunker;
 import com.aliasi.dict.DictionaryEntry;
 import com.aliasi.dict.ExactDictionaryChunker;
 import com.aliasi.dict.MapDictionary;
 import com.aliasi.dict.TrieDictionary;
 import com.aliasi.io.FileLineReader;
+import com.aliasi.spell.FixedWeightEditDistance;
+import com.aliasi.spell.WeightedEditDistance;
 import com.aliasi.tokenizer.IndoEuropeanTokenizerFactory;
 
 
+
+
+
+import com.aliasi.tokenizer.LineTokenizerFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.ResultSet;
+
+import org.apache.commons.lang.WordUtils;
 
 
 public class NER {
@@ -30,7 +39,8 @@ public class NER {
 	private ArrayList<String> clases;
 	//another variable could be the Lucene index if we use it to get the entities
 	//MapDictionary<String> dictionaryExact; /** Dictionary that contains the entities that will be recognized */
-	ExactDictionaryChunker dictionaryChunkerExact;
+	//ExactDictionaryChunker dictionaryChunkerExact;
+	ApproxDictionaryChunker dictionaryChunkerApp;
 	private static final double CHUNK_SCORE = 1.0;
 	
 	public NER(){
@@ -80,7 +90,8 @@ public class NER {
 	
 	public ArrayList<Annotation> annotateQuery(String q){
 		this.query = q;
-		System.out.println("Start query annotation");
+		//System.out.println("Start query annotation");
+		this.query = WordUtils.capitalize(this.query);
 		ArrayList<Annotation> annotations = new ArrayList<Annotation>();
 		annotations = findNamedEntities();
 		return annotations;
@@ -106,7 +117,8 @@ public class NER {
 			Iterator<String> it = exactQueryElems.iterator();
 			while(it.hasNext()){
 				String text = it.next();
-				Chunking chunking = dictionaryChunkerExact.chunk(text);
+				//Chunking chunking = dictionaryChunkerExact.chunk(text);
+				Chunking chunking = this.dictionaryChunkerApp.chunk(text);
 				for (Chunk chunk : chunking.chunkSet()) {
 					int start = chunk.start();
 		            int end = chunk.end();
@@ -123,7 +135,8 @@ public class NER {
 	        Iterator<String> it = approxQueryElems.iterator();
 	        while(it.hasNext()){
 	        	String text = it.next();
-	        	Chunking chunking = dictionaryChunkerExact.chunk(text);
+	        	//Chunking chunking = dictionaryChunkerExact.chunk(text);
+	        	Chunking chunking = this.dictionaryChunkerApp.chunk(text);
 	        	for (Chunk chunk : chunking.chunkSet()) {
 	        		if(addAnnotation(chunk, chunking, text)){
 		        		int start = chunk.start();
@@ -153,8 +166,8 @@ public class NER {
 	 */
 	private void loadDictionaryFromFile(){
 		
-		MapDictionary<String> dictionaryExact = new MapDictionary<String>();
-		//TrieDictionary<String>dictionaryApprox = new TrieDictionary<String>();
+		//MapDictionary<String> dictionaryExact = new MapDictionary<String>();
+		TrieDictionary<String>dictionaryApprox = new TrieDictionary<String>();
 		
 		ArrayList<File> files = new ArrayList<File>();
 		for(int i=0; i<this.filenames.size(); i++){
@@ -167,14 +180,19 @@ public class NER {
 				if(lines != null){
 					for(String elem : lines){
 						String name = elem;
-						dictionaryExact.addEntry(new DictionaryEntry<String>(elem,"ARTIST",CHUNK_SCORE));
-						//dictionaryApprox.addEntry(new DictionaryEntry<String>(name,"ARTIST"));
+						//dictionaryExact.addEntry(new DictionaryEntry<String>(elem,"ARTIST",CHUNK_SCORE));
+						dictionaryApprox.addEntry(new DictionaryEntry<String>(name,"ARTIST"));
 					}
 				}
 			}
 		}catch(IOException ioe){
 			System.out.println("ERROR: problem reading dictionary files on loadDictionary");
 		}
+		
+		WeightedEditDistance editDistance = new FixedWeightEditDistance(0,-1,-1,-1,Double.NaN);
+		double maxDistance = 2.0;
+
+        this.dictionaryChunkerApp = new ApproxDictionaryChunker(dictionaryApprox,LineTokenizerFactory.INSTANCE,editDistance,maxDistance);
 		
 	}
 	
@@ -183,9 +201,11 @@ public class NER {
 	 * It uses the existing DB table to obtain all songs, artists and release names.
 	 */
 	private void loadDictionaryFromDB(){
-		MapDictionary<String> dictionaryExact = new MapDictionary<String>();
+		//MapDictionary<String> dictionaryExact = new MapDictionary<String>();
 		//this.dictionaryExact = new MapDictionary<String>();
 		//this.dictionaryApprox = new TrieDictionary<String>();
+		TrieDictionary<String> dictionaryApprox = new TrieDictionary<String>();
+		System.out.println("Start load of NER dictionary");
 		
 		ArrayList<String> queries = new ArrayList<String>();
 		queries.add("SELECT title FROM artists_apolo");
@@ -203,7 +223,8 @@ public class NER {
 			    while(rs.next()){
 			    	String val = rs.getString("title");
 			    	val = val.substring(0,val.length()-1);
-			    	dictionaryExact.addEntry(new DictionaryEntry<String>(val,this.clases.get(i),CHUNK_SCORE));
+			    	//dictionaryExact.addEntry(new DictionaryEntry<String>(val,this.clases.get(i),CHUNK_SCORE));
+			    	dictionaryApprox.addEntry(new DictionaryEntry<String>(val,this.clases.get(i)));
 			    }
 			}
 			catch (SQLException ex){
@@ -227,8 +248,14 @@ public class NER {
 			}
 		}
 		
-		System.out.println("finished loading dictionary");
-		this.dictionaryChunkerExact = new ExactDictionaryChunker(dictionaryExact, IndoEuropeanTokenizerFactory.INSTANCE, false,false);
+		System.out.println("finished loading NER dictionary");
+		//this.dictionaryChunkerExact = new ExactDictionaryChunker(dictionaryExact, IndoEuropeanTokenizerFactory.INSTANCE, false,false);
+		
+		WeightedEditDistance editDistance = new FixedWeightEditDistance(0,-1,-1,-1,Double.NaN);
+		double maxDistance = 2.0;
+        this.dictionaryChunkerApp = new ApproxDictionaryChunker(dictionaryApprox,LineTokenizerFactory.INSTANCE,editDistance,maxDistance);
+		
+		
 		System.out.println("finished chunckers");
 		try {
 			conn.close();
@@ -255,7 +282,7 @@ public class NER {
 		String c1 = getString(chunk1);
 		for (Chunk chunk2 : chunking.chunkSet()) {
 			String c2 = getString(chunk2);
-			if(c2.contains(c1) && !c2.equals(c1)){
+			if((c2.contains(c1) && !c2.equals(c1)) || c1.contains("\"")){
 				add=false;
 			}
 		}
@@ -270,25 +297,30 @@ public class NER {
 	
 	/*
 	public static void main(String args[]){
-		String q2 = "\"Pearl Jam\" is an artist, Queen is an artist as well, crystal starr knighton is another artist, \"Silver Spoons\" & \"Broken Bones\" are multiple entities but \"Bohemian Rhapsody\" is a song";
-		String q = "Crystal Starr Knighton \"Silver Spoons & Broken Bones\"";
+		String q[] = {	"\"Pearl Jam\" Queen", "Taylor Swift", "a world without us",
+						"\"A night at the Opera\"", "\"Silver Spoons & Broken Bones\"",
+						"\"Silver Spoons\" & \"Broken Bones\"", "\"Bohemian Rhapsody\"",
+						"A night at the Opera", "silver spoons & broken bones"
+				};
+		
 		NER n = new NER();
 		//n.trainModel();
-		ArrayList<Annotation> nes;
-		nes = n.annotateQuery(q);
-		Iterator<Annotation> it = nes.iterator();
-		System.out.println("\nQuery: "+q);
-		while(it.hasNext()){
-			Annotation a = it.next();
-			System.out.println(a.getEntityValue() + "\t" + a.getEntityType());
-		}
 		
-		nes = n.annotateQuery(q2);
-		Iterator<Annotation> it2 = nes.iterator();
-		System.out.println("\nQuery: "+q2);
-		while(it2.hasNext()){
-			Annotation a = it2.next();
-			System.out.println(a.getEntityValue() + "\t" + a.getEntityType());
+		ArrayList<Annotation> nes;
+		
+		for(int i=0; i<q.length; i++){
+			if(i==4){
+				System.out.print("");
+			}
+			nes = n.annotateQuery(q[i]);
+			Iterator<Annotation> it = nes.iterator();
+			
+			System.out.println("\n\n** Query: "+q[i]);
+			System.out.println("ENTITIES");
+			while(it.hasNext()){
+				Annotation a = it.next();
+				System.out.println(a.getEntityValue() + "\t" + a.getEntityType());
+			}
 		}
 	}
 	*/
