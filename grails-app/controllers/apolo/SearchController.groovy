@@ -1,5 +1,6 @@
 package apolo
 
+import org.apache.lucene.search.IndexSearcher
 import org.apache.lucene.search.BooleanClause.Occur;
 
 import apolo.api.DBPediaHTTPXML;
@@ -57,20 +58,22 @@ class SearchController extends BaseController {
 			
 			isSearching = true
 			
+			IndexSearcher indexSearcher = servletContext.getAttribute("indexSearcher")
+			
 			//init searcher for song
-			Searcher songSearcher = new Searcher(Global_Configuration.INDEX_DIRECTORY)
+			Searcher songSearcher = new Searcher(Global_Configuration.INDEX_DIRECTORY, indexSearcher)
 			songSearcher.addQuery("song", "type", Occur.MUST)
 			songSearcher.setPage(1)
 			songSearcher.setResultPerPage(10)
 			
 			//Searcher for release
-			Searcher releaseSearcher = new Searcher(Global_Configuration.INDEX_DIRECTORY)
+			Searcher releaseSearcher = new Searcher(Global_Configuration.INDEX_DIRECTORY, indexSearcher)
 			releaseSearcher.addQuery("release", "type", Occur.MUST)
 			releaseSearcher.setPage(1)
 			releaseSearcher.setResultPerPage(10)
 			
 			//Searcher for artist
-			Searcher artistSearcher = new Searcher(Global_Configuration.INDEX_DIRECTORY)
+			Searcher artistSearcher = new Searcher(Global_Configuration.INDEX_DIRECTORY, indexSearcher)
 			artistSearcher.addQuery("artist", "type", Occur.MUST)
 			artistSearcher.setPage(1)
 			artistSearcher.setResultPerPage(10)
@@ -221,13 +224,15 @@ class SearchController extends BaseController {
 	
 	def getEntity() {
 		
+		IndexSearcher indexSearcher = servletContext.getAttribute("indexSearcher")
+		
 		def model = [:]
 		String data = ""
 		String name = ""
 		
 		String entityID = params.entityID
 		
-		Searcher searcher = new Searcher(Global_Configuration.INDEX_DIRECTORY)
+		Searcher searcher = new Searcher(Global_Configuration.INDEX_DIRECTORY, indexSearcher)
 		searcher.setPage(1)
 		searcher.setResultPerPage(10)
 		searcher.addQuery(entityID.trim(), "documentID", Occur.MUST)
@@ -279,7 +284,10 @@ class SearchController extends BaseController {
 	 */
 	
 	private ArrayList<ApoloDocument> getFirstArtistSongs(ApoloDocument artist) {
-		Searcher searcher = new Searcher(Global_Configuration.INDEX_DIRECTORY)
+		
+		IndexSearcher indexSearcher = servletContext.getAttribute("indexSearcher")
+		
+		Searcher searcher = new Searcher(Global_Configuration.INDEX_DIRECTORY, indexSearcher)
 		searcher.addQuery(artist.getArtistID(), "songArtistsID", Occur.MUST)
 		searcher.addQuery("song", "type", Occur.MUST)
 		searcher.setPage(1)

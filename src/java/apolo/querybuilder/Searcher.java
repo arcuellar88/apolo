@@ -1,6 +1,5 @@
 package apolo.querybuilder;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,8 +7,6 @@ import java.util.Arrays;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexNotFoundException;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanQuery;
@@ -18,7 +15,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.BooleanClause.Occur;
-import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 
 import apolo.entity.ApoloDocument;
@@ -41,14 +37,17 @@ public class Searcher implements ISearcher {
 	 * @throws IOException
 	 */
 	
-	public Searcher(String indexDirectory) throws IOException {
+	public Searcher(String indexDirectory , IndexSearcher anIndexSearcher) throws IOException {
 		this.indexDirectory = indexDirectory;
 		this.analyzer = new StandardAnalyzer(Version.LUCENE_46);
+		this.indexSearcher = anIndexSearcher;
+		/*
 		try {
 			this.indexSearcher = new IndexSearcher(DirectoryReader.open(FSDirectory.open(new File(this.indexDirectory))));
 		} catch (IndexNotFoundException e) {
 			//e.printStackTrace();
 		}
+		*/
 		resetParameters();
 	}
 	
