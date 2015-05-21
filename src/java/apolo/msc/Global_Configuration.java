@@ -39,8 +39,16 @@ public class Global_Configuration
 	public final static String YOUTUBE_KEY = "";
 	
 	// --------------------------------------------------------
+	// MOOMASH
+	// --------------------------------------------------------
+	
+	public final static String MOOMASH_KEY = "";
+	
+	// --------------------------------------------------------
 	// OTHER
 	// --------------------------------------------------------
 	
-	public final static String DATA_FOLDER = "D:/workspace/apolo/data";
+	public final static String DATA_FOLDER = "";
+	public final static String CODEGEN_FOLDER = "";
+	public final static String TEMP_FOLDER = "";
 }

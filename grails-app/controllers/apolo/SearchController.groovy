@@ -1,11 +1,14 @@
 package apolo
 
+import java.io.File;
+
 import org.apache.lucene.search.IndexSearcher
 import org.apache.lucene.search.BooleanClause.Occur;
 
 import apolo.api.DBPediaHTTPXML;
 import apolo.api.DPPediaHTTPSPARQL
 import apolo.api.IDBpedia;
+import apolo.api.MoomashAPI
 import apolo.api.YouTubeAPI
 import apolo.entity.ApoloDocument
 import apolo.entity.Artist
@@ -25,13 +28,11 @@ import apolo.recommender.Recommender
 import grails.converters.JSON
 import groovy.json.JsonSlurper
 
+import org.apache.commons.codec.binary.Base64;
+
 class SearchController extends BaseController {
 
     def index() { 		
-		
-		//init NER module
-		NER ner = servletContext.getAttribute("ner");
-		SpellingCorrection spellChecker = servletContext.getAttribute("spellchecker")
 		
 		def isSearching = false
 		def model = [:]
@@ -46,6 +47,11 @@ class SearchController extends BaseController {
 		long start = System.currentTimeMillis()
 		
 		if (!query.equals("")) {
+			
+			//init NER module
+			NER ner = servletContext.getAttribute("ner");
+			SpellingCorrection spellChecker = servletContext.getAttribute("spellchecker")
+			
 			println "\n\nKEYWORD: " + query
 			//Get spelling correction
 			spellingCorrectedString = spellChecker.getSpellingSuggestions(query)
@@ -432,5 +438,72 @@ class SearchController extends BaseController {
 		ArrayList<String> suggestions = autoComplete.getCompletionsList(query)
 		def result = [keyword : query , suggestions : suggestions]
 		render result as JSON
+	}
+	
+	def upload() {
+		
+		String songName = ""
+		
+		try {
+			
+			String data = params.data
+			String name = session.id
+			
+			int secondRecorded = (int) (Double.parseDouble(params.secondRecorded))
+			
+			data = data.replace("data:audio/wav;base64,", "")
+			data = data.replace(" ", "+")
+			byte[] bytes = data.getBytes()
+			byte[] valueDecoded = Base64.decodeBase64(bytes)
+			
+			def fileName = Global_Configuration.TEMP_FOLDER + "/" + name + ".wav"
+			
+			FileOutputStream os = new FileOutputStream(new File(fileName))
+			os.write(valueDecoded)
+			os.close();
+			
+			if (secondRecorded >= 30) {
+				songName = getSongName(fileName, 30)
+				println "SONG NAME 30: " + songName
+			}
+			
+			if (songName == null && secondRecorded >= 20) {
+				songName = getSongName(fileName, 20)
+			}
+			println "SONG NAME 20: " + getSongName(fileName, 20)
+			
+			if (songName == null && secondRecorded >= 15) {
+				songName = getSongName(fileName, 15)		
+			}
+			println "SONG NAME 15: " + getSongName(fileName, 15)
+			
+			if (songName == null) {
+				songName = ""				
+			}
+			
+			File file  = new File(fileName)
+			file.delete()
+			
+		} catch (Exception e) {
+			println "Exception"
+			e.printStackTrace();
+		}
+		
+		def model = [songName : songName]
+		render model as JSON
+	}
+	
+	def getSongName(fileName, length) {
+		MoomashAPI mmapi = new MoomashAPI()
+		def code = mmapi.getCode(fileName, length)
+		if (code != null) {
+			def songName = mmapi.query(code)
+			if (songName != null) {
+				return songName
+			}
+			else {
+				return null
+			}
+		}
 	}
 }

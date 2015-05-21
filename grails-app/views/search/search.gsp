@@ -15,7 +15,7 @@
 							<div class="input-group">
 			                    <input required value="${params.keyword}" name="keyword" autocomplete="off" id="search" type="text" class="form-control input-lg" placeholder="What are you looking for?">
 			                    <span class="input-group-addon"><a id="voice-search-btn" href="javascript:void(0)"><i class="fa fa-microphone"></i></a></span>
-			                    <span class="input-group-addon"><a href="javascript:void(0)"><i class="fa fa-headphones"></i></a></span>
+			                    <span class="input-group-addon"><a id="voice-record-btn" href="javascript:void(0)"><i class="fa fa-headphones"></i></a></span>
 	                  		</div>
 	                  	</div>	
                   	
@@ -147,8 +147,28 @@
             </div>
  	 </g:if>
  	 
+ 	  <!-- AUDIO RECORDING MODEL -->
+       <div id="audio-modal" class="modal" style="display: none">
+       	<div class="modal-dialog modal-lg">
+           	<div class="modal-content">
+             		<div class="modal-header">
+               		<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+               		<h4 class="modal-title">Recording...</h4>
+             		</div>
+             		
+             		<div class="modal-body">
+               			<div class="progress" style="margin-top: 10px; margin-bottom: 10px">
+		                    <div class="progress-bar progress-bar-primary progress-bar-striped" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+		                      	<span style="position: static"class="sr-only">0</span>
+		                    </div>
+		                  </div>
+             		</div>
+           </div><!-- /.modal-content -->
+         </div><!-- /.modal-dialog -->
+       </div>
  	 
- 	 
+	 <script src="${resource(dir: 'js', file: 'plugins/recording/mp3recorder.js')}" type="text/javascript"></script>
+	 
  	 <script type="text/javascript">
 	   //Voive recognition
 	  	var recognition = new webkitSpeechRecognition();
@@ -174,6 +194,8 @@
 			initAutocomplete();
 
 			initModalEntity();
+
+			initRecording();
 		});
 
 		function initAutocomplete() {
