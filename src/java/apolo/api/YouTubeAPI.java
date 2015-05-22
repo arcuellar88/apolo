@@ -38,4 +38,9 @@ public class YouTubeAPI {
 			return "";
 		}
 	}
+	
+	public static void main(String[] args) {
+		YouTubeAPI youtubeAPI = new YouTubeAPI();
+		System.out.println(youtubeAPI.query("Candle In The Wind"));
+	}
 }

@@ -47,6 +47,7 @@ function initRecording() {
 			  recorderObject = new MP3Recorder(audio_context, stream);
 			  recorderObject.start();
 			  secondRecorded = 0;
+			  $('#audio-modal .modal-title').html("Recording...");
 			  
 			  recordingProgressId = window.setInterval(function(){
 				  
@@ -62,13 +63,31 @@ function initRecording() {
 					  recorderObject.stop();
 					  recorderObject.stop();
 					  
+					  $('#audio-modal .progress').hide();
+					  $('#audio-modal .modal-title').html("Uploading...");
+					  $('#audio-modal .progress-bar span').html("0%");
+					  $('#audio-modal .progress').show();
+					  
 					  recorderObject.exportWAV(function(wavData) {
-						  data = 'data:audio/wav;base64,' + wavData,
+						  data = 'data:audio/wav;base64,' + wavData;
 						  $.ajax({
 							  type: "post",
 							  url: "/apolo/search/upload",
-							  timeout: 30000,
-							  data : {data : data, secondRecorded : secondRecorded},
+							  timeout: 300000,
+							  data : {data : data, secondRecorded : secondRecorded.toFixed(0)},
+							  xhr: function() {
+							        var xhr = new window.XMLHttpRequest();
+							        xhr.upload.addEventListener("progress", function(evt) {
+							            if (evt.lengthComputable) {
+							                var percentComplete = evt.loaded / evt.total;
+							                var percent = percentComplete * 100;
+							                $('#audio-modal .progress-bar span').html(percent.toFixed(0) + "%");
+							                $('#audio-modal .progress-bar').css("width" , percent.toFixed(0) + "%");
+							            }
+							       }, false);
+							        
+							        return xhr;
+							  },
 							  success: function(data) {
 								  if (data.songName.length > 0) {
 									  $('#search-form #search').val(data.songName);
@@ -81,7 +100,7 @@ function initRecording() {
 								  }
 								
 							  }
-						  })	
+						  });
 					  });
 				  }
 			  }, 100)

@@ -217,7 +217,6 @@
 				url: "search/getSuggestion",
 				data: {keyword : query},
 				success: function(data) {
-					console.log(data)
 					$("#search").typeahead("destroy");
 					$("#search").typeahead({ source: data.suggestions });
 					$("#search").typeahead('lookup');
