@@ -48,6 +48,9 @@ function initRecording() {
 			  recorderObject.start();
 			  secondRecorded = 0;
 			  $('#audio-modal .modal-title').html("Recording...");
+			  $('#audio-modal .progress').hide();
+			  $('#audio-modal .progress-bar').css("width" , "0%");
+			  $('#audio-modal .progress').show();
 			  
 			  recordingProgressId = window.setInterval(function(){
 				  
