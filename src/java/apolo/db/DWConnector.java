@@ -77,6 +77,36 @@ public class DWConnector {
 		
 		return artist;
 	}
+	
+	/**
+	 * Get's the play count for a song
+	 * @param song_id id of the song 
+	 * @return PlayCountResult nr_users and nr_plays for a given song
+	 */
+	public PlayCountResult getPlayCountSong(int song_id) {
+		
+		String query = "select fk_dimsong,count(*) as nr_plays,count(distinct FK_DIMUSER) as nr_users from apolo_master.factsongplaycount where fk_dimsong=? group by fk_dimsong";
+		PlayCountResult pcr= new PlayCountResult();
+		pcr.setSong_id(song_id);
+		try {
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setInt(1, song_id);
+			ResultSet rs = ps.executeQuery();
+
+			if (rs.next()) {
+				pcr.setNr_plays(rs.getInt("nr_plays"));
+				pcr.setNr_users(rs.getInt("nr_users"));
+
+				//Log.print(artist.toString());
+			}
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return pcr;
+	}
 
 	public static void main(String[] args) {
 		DWConnector db = new DWConnector();
@@ -84,7 +114,7 @@ public class DWConnector {
 		// do not commit login details!
 		try {
 
-			db.getArtist(4264124);
+			System.out.println(db.getPlayCountSong(4993872));
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
