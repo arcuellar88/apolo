@@ -85,7 +85,7 @@ public class DWConnector {
 	 */
 	public PlayCountResult getPlayCountSong(int song_id) {
 		
-		String query = "select fk_dimsong,count(*) as nr_plays,count(distinct FK_DIMUSER) as nr_users from apolo_master.factsongplaycount where fk_dimsong=? group by fk_dimsong";
+		String query = "select  nr_plays, nr_users from apolo_master.fsp_song where fk_dimsong=?";
 		PlayCountResult pcr= new PlayCountResult();
 		pcr.setSong_id(song_id);
 		try {
