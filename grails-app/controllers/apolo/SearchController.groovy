@@ -318,11 +318,12 @@ class SearchController extends BaseController {
 		Ranking rartists = recommender.getRecommendation(artist, 10)
 		
 		for(int i = 0 ; i < rartists.getItems().size(); i++) {
+			Artist a = (Artist)rartists.getItems().get(i);
 			ApoloDocument newItem = new ApoloDocument()
 			newItem.setType("artist")
-			newItem.setArtistID(rartists.getItems().get(i).getItemId() + "")
-			newItem.setArtistName(rartists.getItems().get(i).getItemName())
-			newItem.setDocumentID("artist_" + rartists.getItems().get(i).getItemId())
+			newItem.setArtistID(a.getArtist_id() + "")
+			newItem.setArtistName(a.getName())
+			newItem.setDocumentID("artist_" + a.getArtist_id())
 			recommendedItems.add(newItem)
 		}
 		
