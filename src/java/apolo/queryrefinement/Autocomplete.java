@@ -46,14 +46,14 @@ public class Autocomplete {
 		loadDictionaryFromDB();
 		//loadDictionaryFromFile();
 		this.matchWeight = 0.0;
-        this.insertWeight = -10.0;
-        this.substituteWeight = -10.0;
-        this.deleteWeight = -10.0;
+        this.insertWeight = -1.0;
+        this.substituteWeight = -20.0;
+        this.deleteWeight = -40.0;
         this.transposeWeight = Double.NEGATIVE_INFINITY;
         this.editDistance = new FixedWeightEditDistance(matchWeight,deleteWeight,insertWeight,substituteWeight,transposeWeight);
         this.maxResults = 5;
         this.maxQueueSize = 10000;
-        this.minScore = -25.0;
+        this.minScore = -40.0;
         completer = new AutoCompleter(dictionary, editDistance, maxResults, maxQueueSize, minScore);
 	}
 	
