@@ -238,7 +238,6 @@ public class Recommender implements IRecommender {
 					artist.setGender(rs.getString("ARTIST_GENDER"));
 					artist.setName(rs.getString("ARTIST_NAME"));
 					artist.setType(rs.getString("ARTIST_TYPE"));
-					
 					IRankingItem ri=artist;
 					ri.setSimilarity(rs.getDouble("similarity"));
 					ranking.addRankingItem(ri);

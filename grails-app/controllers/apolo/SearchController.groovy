@@ -296,8 +296,8 @@ class SearchController extends BaseController {
 		Searcher searcher = new Searcher(Global_Configuration.INDEX_DIRECTORY, indexSearcher)
 		searcher.addQuery(artist.getArtistID(), "songArtistsID", Occur.MUST)
 		searcher.addQuery("song", "type", Occur.MUST)
-		//searcher.setPage(1)
-		//searcher.setResultPerPage(100)
+		searcher.setPage(1)
+		searcher.setResultPerPage(10000)
 		searcher.execute()
 		return searcher.getResults()
 	}

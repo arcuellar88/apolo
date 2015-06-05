@@ -123,7 +123,7 @@ public class DPPediaHTTPSPARQL implements IDBpedia {
 
 				"WHERE { ?song dbpprop:name \"" + s.getTitle()+ "\"@en .?song dbpprop:thisSingle  ?single  ."+
 				"?song dbpedia-owl:abstract  ?desc  ."+
-				"}";
+				"filter langMatches(lang(?desc),\"en\") }";
 
 		String queryResult = this.makeQuery(query)
 		// System.out.println (queryResult);
@@ -155,7 +155,7 @@ public class DPPediaHTTPSPARQL implements IDBpedia {
 
 				"WHERE { ?song dbpprop:name \"" + r.getName()+ "\"@en .?song dbpprop:thisAlbum ?single  ."+
 				"?song dbpedia-owl:abstract  ?desc  ."+
-				"}";
+				"filter langMatches(lang(?desc),\"en\") }";
 
 		String queryResult = this.makeQuery(query)
 		// System.out.println (queryResult);
