@@ -76,7 +76,7 @@ function initRecording() {
 						  data = 'data:audio/wav;base64,' + wavData;
 						  $.ajax({
 							  type: "post",
-							  url: serverURL + "/search/upload",
+							  url: "search/upload",
 							  timeout: 300000,
 							  data : {data : data, secondRecorded : secondRecorded.toFixed(0)},
 							  xhr: function() {

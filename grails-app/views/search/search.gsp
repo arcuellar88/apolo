@@ -124,7 +124,7 @@
 					                function initRecommendation() {
 					        			var artistID = $('.artist-recomendation-wrapper').attr("artist-id")
 					        			$.ajax({
-					        				url : serverURL + "/search/getRecommendationArtist?artistID=" + artistID,
+					        				url : "search/getRecommendationArtist?artistID=" + artistID,
 					        				success: function(data) {
 					        					$('.artist-recomendation-wrapper').html(data);
 					        					initModalEntity();
@@ -245,7 +245,7 @@
 			$("a.load-document-id").unbind('click').click(function(e){
 				var entityID = $(this).attr("entity-id")
 				$.ajax({
-					url : serverURL + "/search/getEntity?entityID=" +entityID,
+					url : "search/getEntity?entityID=" +entityID,
 					dataType: "json",
 					beforeSend: function() {
 						$('#entity-modal .modal-body').html('<div class="overlay centered"><i class="fa fa-circle-o-notch fa-spin"></i></div>');
