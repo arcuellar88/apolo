@@ -69,13 +69,14 @@ function initRecording() {
 					  $('#audio-modal .progress').hide();
 					  $('#audio-modal .modal-title').html("Uploading...");
 					  $('#audio-modal .progress-bar span').html("0%");
+					  $('#audio-modal .progress-bar').css("width" , "0%");
 					  $('#audio-modal .progress').show();
 					  
 					  recorderObject.exportWAV(function(wavData) {
 						  data = 'data:audio/wav;base64,' + wavData;
 						  $.ajax({
 							  type: "post",
-							  url: "/apolo/search/upload",
+							  url: serverURL + "/search/upload",
 							  timeout: 300000,
 							  data : {data : data, secondRecorded : secondRecorded.toFixed(0)},
 							  xhr: function() {

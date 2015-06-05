@@ -48,26 +48,6 @@
        			</tr>
     			
        			<tr>
-       				<td>Total play:</td>
-       				<td>
-       					<g:if test="${song.songTotalPlayCount != Integer.MAX_VALUE}">
-       						${song.songTotalPlayCount}
-       					</g:if>
-       				</td>
-       			</tr>
-       			
-       			<tr>
-       				<td>Country:&nbsp;&nbsp;&nbsp;</td>
-       				<td>
-       					<% ArrayList<String> songCountries = song.getSplittedFields(song.songCountries); %>
-       					<g:each in="${songCountries}" var="country" status="i">
-       						<g:if test="${i > 0}"><br></g:if>
-       						${country}
-       					</g:each>
-       				</td>
-       			</tr>
-    			
-       			<tr>
        				<td>Genre: </td>
        				<td>
        					<% ArrayList<String> songGenres = song.getSplittedFields(song.songGenres); %>

@@ -30,11 +30,6 @@
 	       			</tr>
 	       			
 	       			<tr>
-	       				<td><b>Artist:</b></td>
-	       				<td>${release.releaseArtist}</td>
-	       			</tr>
-	       			
-	       			<tr>
 	       				<td><b>#Song:</b></td>
 	       				<td>
 	       					<g:if test="${release.releaseSongs.equals("")}">

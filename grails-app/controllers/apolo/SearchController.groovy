@@ -296,8 +296,8 @@ class SearchController extends BaseController {
 		Searcher searcher = new Searcher(Global_Configuration.INDEX_DIRECTORY, indexSearcher)
 		searcher.addQuery(artist.getArtistID(), "songArtistsID", Occur.MUST)
 		searcher.addQuery("song", "type", Occur.MUST)
-		searcher.setPage(1)
-		searcher.setResultPerPage(100)
+		//searcher.setPage(1)
+		//searcher.setResultPerPage(100)
 		searcher.execute()
 		return searcher.getResults()
 	}
@@ -339,7 +339,7 @@ class SearchController extends BaseController {
 		String query = song.getSongTitle()
 		
 		//add artist if possible
-		if (song.getSongTitle().length() <= 10 && !song.getSongArtists().equals("")) {
+		if (song.getSongTitle().length() <= 1<<20 && !song.getSongArtists().equals("")) {
 			ArrayList<String> artistNames = song.getSplittedFields(song.getSongArtists())
 			for(String artistName : artistNames) {
 				query += " " + artistName
@@ -369,6 +369,12 @@ class SearchController extends BaseController {
 		}
 	}
 	
+	/**
+	 * Get DBpedia 
+	 * @param document
+	 * @return
+	 */
+	
 	private getDBPediaInfo(ApoloDocument document) {
 		
 		IDBpedia dbpediaClient = new DBPediaHTTPXML();
@@ -377,8 +383,8 @@ class SearchController extends BaseController {
 		if (document.getType().equalsIgnoreCase("song")) {
 			ISong isong = new Song()
 			
-			isong.setTitle(document.getSongTitle())
-			dbpediaClient.getAdditionalInformationSong(isong)
+			isong.setTitle(dbpediaSPARQLClient.capitalizeString(document.getSongTitle()))
+			dbpediaSPARQLClient.getAdditionalInformationSong(isong)
 			
 			document.setIsong(isong)
 		} else if (document.getType().equalsIgnoreCase("artist")) {
@@ -395,11 +401,10 @@ class SearchController extends BaseController {
 		} else if (document.getType().equalsIgnoreCase("release")) {
 			//Release
 			IRelease irelease = new Release()
-			
-			irelease.setName(document.getReleaseName())
+			irelease.setName(dbpediaSPARQLClient.capitalizeString(document.getReleaseName()))
 			irelease.setType(document.getReleaseType())
 			
-			dbpediaClient.getAdditionalInformationRelease(irelease)
+			dbpediaSPARQLClient.getAdditionalInformationRelease(irelease)
 			document.setIrelease(irelease)
 		}
 	}
@@ -439,6 +444,11 @@ class SearchController extends BaseController {
 		def result = [keyword : query , suggestions : suggestions]
 		render result as JSON
 	}
+	
+	/**
+	 * Upload song recording to server
+	 * @return
+	 */
 	
 	def upload() {
 		
@@ -492,6 +502,13 @@ class SearchController extends BaseController {
 		def model = [songName : songName]
 		render model as JSON
 	}
+	
+	/**
+	 * Detect song name by Moomash API
+	 * @param fileName
+	 * @param length
+	 * @return
+	 */
 	
 	def getSongName(fileName, length) {
 		MoomashAPI mmapi = new MoomashAPI()

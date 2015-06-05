@@ -14,5 +14,7 @@ public interface IRelease {
 	public String getDescription();
 	public void setURI(String textContent);
 	public String getURI();
+	public String getThumbnail();
+	public void setThumbnail(String thumbnail);
 	
 }

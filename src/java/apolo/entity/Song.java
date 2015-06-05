@@ -20,6 +20,7 @@ public class Song extends RankingItem implements ISong{
 	private Date releaseDate;
 	private String description;
 	private String URI;
+	private String thumbnail;
 	
 	//Features
 	
@@ -75,7 +76,7 @@ public class Song extends RankingItem implements ISong{
 		return title;
 	}
 	public void setTitle(String title) {
-		this.title = title;
+	this.title = title;
 	}
 	public String getRating() {
 		return rating;
@@ -163,6 +164,13 @@ public class Song extends RankingItem implements ISong{
 		URI = uRI;
 	}
 	
-	
+	public String getThumbnail() {
+		return thumbnail;
+	}
+
+
+	public void setThumbnail(String thumbnail) {
+		this.thumbnail = thumbnail;
+	}
 	
 }

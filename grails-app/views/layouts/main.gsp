@@ -40,6 +40,9 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
+    <script type="text/javascript">
+		serverURL = "${grailsApplication.config.grails.serverURL}";
+	</script>
   </head>
   <body class="skin-blue sidebar-collapse">
     <div class="wrapper">
@@ -55,30 +58,7 @@
           </a>
           <div class="navbar-custom-menu">
             <ul class="nav navbar-nav">
-              <!-- User Account: style can be found in dropdown.less -->
-              <li class="dropdown user user-menu">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                  <img src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-xpa1/v/t1.0-1/p160x160/10491073_10153153099494560_2553714796370408923_n.jpg?oh=fb6a70d39147c4dc12071fe20f615702&oe=5579EDA8&__gda__=1438375993_50b2defe0b014dbd0bf3786ecb042694" class="user-image" alt="User Image"/>
-                  <span class="hidden-xs">Shakira</span>
-                </a>
-                <ul class="dropdown-menu">
-                  <!-- User image -->
-                  <li class="user-header">
-                    <img src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-xpa1/v/t1.0-1/p160x160/10491073_10153153099494560_2553714796370408923_n.jpg?oh=fb6a70d39147c4dc12071fe20f615702&oe=5579EDA8&__gda__=1438375993_50b2defe0b014dbd0bf3786ecb042694" class="img-circle" alt="User Image" />
-                    <p>
-                      Shakira
-                      <small>Member since March. 2015</small>
-                    </p>
-                  </li>
-                  <!-- Menu Body -->
-                  <!-- Menu Footer-->
-                  <li class="user-footer">
-                    <div class="pull-right">
-                      <a href="#" class="btn btn-default btn-flat">Sign out</a>
-                    </div>
-                  </li>
-                </ul>
-              </li>
+              
             </ul>
           </div>
         </nav>

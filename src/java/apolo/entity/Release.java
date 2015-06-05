@@ -22,7 +22,7 @@ public class Release extends RankingItem implements IRelease{
 	
 	private String description;
 	private String URI;
-	
+	private String thumbnail;
 	public Release() {
 		// Empty Artists
 	}
@@ -68,4 +68,13 @@ public class Release extends RankingItem implements IRelease{
 		URI = uRI;
 	}
 	
+	
+	public String getThumbnail() {
+		return thumbnail;
+	}
+
+
+	public void setThumbnail(String thumbnail) {
+		this.thumbnail = thumbnail;
+	}
 }

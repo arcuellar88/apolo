@@ -4,6 +4,15 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
 <meta name="layout" content="main"/>
 <title>Apolo Music</title>
+<script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	
+	  ga('create', 'UA-63787311-1', 'auto');
+	  ga('send', 'pageview');
+</script>
 </head>
 <body>
   <div class="body">
@@ -115,7 +124,7 @@
 					                function initRecommendation() {
 					        			var artistID = $('.artist-recomendation-wrapper').attr("artist-id")
 					        			$.ajax({
-					        				url : "/apolo/search/getRecommendationArtist?artistID=" + artistID,
+					        				url : serverURL + "/search/getRecommendationArtist?artistID=" + artistID,
 					        				success: function(data) {
 					        					$('.artist-recomendation-wrapper').html(data);
 					        					initModalEntity();
@@ -157,6 +166,9 @@
              		</div>
              		
              		<div class="modal-body">
+            				<div class="centered" style="font-size: 30px">
+            					<i class="fa fa-fw fa-headphones"></i>
+            				</div>
                			<div class="progress" style="margin-top: 10px; margin-bottom: 10px">
 		                    <div class="progress-bar progress-bar-primary progress-bar-striped" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
 		                      	<span style="position: static"class="sr-only">0</span>
@@ -185,6 +197,9 @@
         });
 			
 	  	$(document).ready(function(){
+
+	  		$('#search').focus();
+		  	
 			$('ul.typeahead.dropdown-menu').css('width', $('#search').css('width'));
 			
 			$('#voice-search-btn').click(function(){
@@ -230,7 +245,7 @@
 			$("a.load-document-id").unbind('click').click(function(e){
 				var entityID = $(this).attr("entity-id")
 				$.ajax({
-					url : "/apolo/search/getEntity?entityID=" +entityID,
+					url : serverURL + "/search/getEntity?entityID=" +entityID,
 					dataType: "json",
 					beforeSend: function() {
 						$('#entity-modal .modal-body').html('<div class="overlay centered"><i class="fa fa-circle-o-notch fa-spin"></i></div>');

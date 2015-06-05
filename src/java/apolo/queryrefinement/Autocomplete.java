@@ -145,11 +145,12 @@ public class Autocomplete {
 		Connection conn = null;
 		try {
 		    conn =
-		       DriverManager.getConnection("jdbc:mysql://localhost/" +
+		       DriverManager.getConnection("jdbc:mysql://" + Global_Configuration.MYSQL_HOST + "/" +
 					  					    Global_Configuration.MYSQL_DB + "?" +
 					                        "user=" + Global_Configuration.MYSQL_USER + 
 					                        "&password=" + Global_Configuration.MYSQL_PWD);
 		} catch (SQLException ex) {
+			ex.printStackTrace();
 		}
 		return conn;
 	}
