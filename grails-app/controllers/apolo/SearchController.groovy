@@ -47,7 +47,7 @@ class SearchController extends BaseController {
 		long start = System.currentTimeMillis()
 		
 		if (!query.equals("")) {
-			
+			model.searchingForArtist = false;
 			//init NER module
 			NER ner = servletContext.getAttribute("ner");
 			SpellingCorrection spellChecker = servletContext.getAttribute("spellchecker")
@@ -185,10 +185,13 @@ class SearchController extends BaseController {
 			
 			//Get song of the first artist
 			if (artists.size() > 0) {
-				model.firstArtistSongs = getFirstArtistSongs(artists.get(0))
+				model.firstArtistSongs = getFirstArtistSongs(artists.get(0), 15)
 				
 				println "RETRIEVE SONGS FOR FIRST ARTIST: " + ((System.currentTimeMillis() - start)) * 1.0 / 1000
 				start = System.currentTimeMillis()
+				if (artists.get(0).getArtistName().trim().equalsIgnoreCase(query.trim())) {
+					model.searchingForArtist = true;
+				}
 			}
 			else {
 				model.firstArtistSongs = new ArrayList<ApoloDocument>()
@@ -248,7 +251,7 @@ class SearchController extends BaseController {
 		ApoloDocument entity = searcher.getResults().get(0)
 		
 		getDBPediaInfo(entity)
-		
+		print "TYPEEEEEEEEEEEE: " + entity.getType();
 		if (entity.getType().equalsIgnoreCase("song")) {
 			//Youtube link
 			String youtubeURL = getYouTubeURL(entity)
@@ -260,7 +263,7 @@ class SearchController extends BaseController {
 		}
 		else if (entity.getType().equalsIgnoreCase("artist")) {
 			
-			model.firstArtistSongs = getFirstArtistSongs(entity)
+			model.firstArtistSongs = getFirstArtistSongs(entity, 15)
 			model.recommendedArtists = getRecommendation(entity)
 			
 			name = entity.getArtistName()
@@ -282,6 +285,22 @@ class SearchController extends BaseController {
 		render json as JSON
 	}
 	
+	/**
+	 * Get all songs of an artist
+	 * @return
+	 */
+	
+	public getAllArtistSong() {
+		String artistID = params.artistID
+		model = [:]
+		ApoloDocument artist = new ApoloDocument();
+		artist.setArtistID(artistID);
+		model.firstArtistSongs = getFirstArtistSongs(artist, 100000)
+		data = g.render(template : "/template/_first-artist-songs" , model : model);
+		def json = [data : data]
+		render json as JSON
+	}
+	
 	
 	/**
 	 * Get songs of first artist
@@ -289,7 +308,7 @@ class SearchController extends BaseController {
 	 * @return
 	 */
 	
-	private ArrayList<ApoloDocument> getFirstArtistSongs(ApoloDocument artist) {
+	private ArrayList<ApoloDocument> getFirstArtistSongs(ApoloDocument artist, int limit) {
 		
 		IndexSearcher indexSearcher = servletContext.getAttribute("indexSearcher")
 		
@@ -297,9 +316,19 @@ class SearchController extends BaseController {
 		searcher.addQuery(artist.getArtistID(), "songArtistsID", Occur.MUST)
 		searcher.addQuery("song", "type", Occur.MUST)
 		searcher.setPage(1)
-		searcher.setResultPerPage(10000)
+		searcher.setResultPerPage(limit)
 		searcher.execute()
-		return searcher.getResults()
+		
+		Set<String> songTitles = new HashSet<String>();
+		ArrayList<ApoloDocument> results = searcher.getResults()
+		
+		for(ApoloDocument adocument : results) {
+			songTitles.add(adocument.getSongTitle());
+		}
+		
+		ArrayList<ApoloDocument> finalResults = new ArrayList<ApoloDocument>();
+		finalResults.addAll(songTitles);
+		return finalResults;
 	}
 	
 	/**

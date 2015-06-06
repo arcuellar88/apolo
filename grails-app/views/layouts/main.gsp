@@ -28,6 +28,9 @@
     
     <script src="${resource(dir: 'js', file: 'scripts.js')}" type="text/javascript"></script>
     
+    <!-- Bootstrap 3.3.2 JS -->
+    <script src="${resource(dir: 'js', file: 'bootstrap.min.js')}" type="text/javascript"></script> 
+    
     <!-- Google chart -->
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
@@ -89,8 +92,6 @@
     <script>
       $.widget.bridge('uibutton', $.ui.button);
     </script>
-    <!-- Bootstrap 3.3.2 JS -->
-    <script src="${resource(dir: 'js', file: 'bootstrap.min.js')}" type="text/javascript"></script>    
     <!--script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script-->
     
     <!-- Bootstrap WYSIHTML5 -->

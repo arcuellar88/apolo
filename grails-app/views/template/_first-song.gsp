@@ -1,5 +1,6 @@
 <%@page import="apolo.msc.Global_Configuration"%>
 <%@page import="apolo.entity.ApoloDocument"%>
+<%@page import="java.text.DecimalFormat"%>
     	<div class="box box-success">
         	<div class="box-header with-border">
              	<h3 class="box-title"><strong>${song.songTitle}</strong></h3>
@@ -24,7 +25,12 @@
       							<g:if test="${i > 0}">
       								<br>
       							</g:if>
-      							<a entity-id="artist_${songArtistIDs.get(i)}" class="load-document-id" href="javascript:void(0)">${artist}</a>
+      							<g:if test="${artist.equalsIgnoreCase('others')}">
+      								${artist}
+      							</g:if>
+      							<g:if test="${!artist.equalsIgnoreCase('others')}">
+      								<a entity-id="artist_${songArtistIDs.get(i)}" class="load-document-id" href="javascript:void(0)">${artist}</a>
+      							</g:if>
        					</g:each>
        				</td>
     						</tr>
@@ -33,7 +39,11 @@
        				<td>Rating:</td>
        				<td>
        					<g:if test="${song.songRating != Integer.MAX_VALUE}">
-       						${song.songRating}
+       						<% 
+							   DecimalFormat df = new DecimalFormat();
+							   df.setMaximumFractionDigits(0);
+	       					%>
+       						${df.format(song.getSongRating())}
        					</g:if>
        				</td>
        			</tr>
@@ -97,9 +107,22 @@
     			</div>
             	
            	<div class="row">
+           		
            		<div class="col-lg-6">
-           			<img style="max-width: 100%; border: 4px solid #DDD;" src="http://placehold.it/600x340&text=Song play count graph"/>
-           			<div id="song-playcount-chart"></div>
+           			<!--  
+           				<img style="max-width: 100%; border: 4px solid #DDD;" src="http://placehold.it/600x340&text=Song play count graph"/>
+           				<div id="song-playcount-chart"></div>
+           			-->
+           			
+           			<div>
+              		<label class="text-aqua">Additional information</label>
+              		<p>
+              			<g:if test="${song.isong != null}">
+              				${song.isong.description}
+              			</g:if>
+              		</p>
+              	</div>
+           			
            		</div>
             
               <div class="col-lg-6">
@@ -154,14 +177,7 @@
               		</tr>
               	</table>
              	
-              	<div>
-              		<label class="text-aqua">Additional information</label>
-              		<p>
-              			<g:if test="${song.isong != null}">
-              				${song.isong.description}
-              			</g:if>
-              		</p>
-              	</div>
+              
            	 	</div>
     		</div>
 		</div><!-- /.box-body -->

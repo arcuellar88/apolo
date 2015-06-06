@@ -23,6 +23,23 @@ function drawRatingPieChart(positiveRating, neutralRating, negativeRating, chart
 	chart.draw(data);
 }
 
+function initLoadAllArtistSongs() {
+	$('a.view-all-song-btn').click(function(e){
+		var container = $(this).closest(".all-artist-song");
+		var artistID = $(this).attr("artistID");
+		$.ajax({
+			 url: serverURL + "search/getAllArtistSong",
+			 data: {artistID : artistID},
+			 beforeSend: function() {
+				container.html('<div class="clearfix"></div><div class="overlay centered" style="height: 30px; position: relative;"><i class="fa fa-circle-o-notch fa-spin"></i></div>'); 
+			 },
+			 success: function(data) {
+				 container.html(data.data);
+			 }
+		});
+	});
+}
+
 function initRecording() {
 	
 	window.AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -76,7 +93,7 @@ function initRecording() {
 						  data = 'data:audio/wav;base64,' + wavData;
 						  $.ajax({
 							  type: "post",
-							  url: "search/upload",
+							  url: serverURL + "search/upload",
 							  timeout: 300000,
 							  data : {data : data, secondRecorded : secondRecorded.toFixed(0)},
 							  xhr: function() {

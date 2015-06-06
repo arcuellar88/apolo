@@ -59,14 +59,14 @@
 				<div class="col-lg-9">
 					<div class="nav-tabs-custom">
 		                <ul class="nav nav-tabs">
-		                  	<li class="active"><a href="#tab-song" data-toggle="tab" aria-expanded="false">Songs</a></li>
-		                  	<li class=""><a href="#tab-artist" data-toggle="tab" aria-expanded="false">Artists</a></li>
+							<li class="${!searchingForArtist ? 'active':''}"><a href="#tab-song" data-toggle="tab" aria-expanded="false">Songs</a></li>
+		                  	<li class="${searchingForArtist ? 'active':''}"><a href="#tab-artist" data-toggle="tab" aria-expanded="false">Artists</a></li>
 		                 	<li><a href="#tab-release" data-toggle="tab" aria-expanded="true">Releases</a></li>
 		                </ul>
 		                
 		                
 		                <div class="tab-content">
-		                  	<div class="tab-pane active" id="tab-song">
+		                  	<div class="tab-pane ${!searchingForArtist ? 'active':''}" id="tab-song">
 		                  		<g:each in="${songs}" var="song" status="songCounter">
 		                  			<g:if test="${songCounter==0}">
 		                  				<g:render template="/template/first-song" model="[song: song]"/>
@@ -78,7 +78,7 @@
 		                  			
 		                </div><!-- /.tab-pane -->
 		                
-		                  <div class="tab-pane" id="tab-artist">
+		                  <div class="tab-pane ${searchingForArtist ? 'active':''}" id="tab-artist">
 		                    	<g:each in="${artists}" var="artist" status="artistCounter">
 		                  			<g:if test="${artistCounter==0}">
 		                  				<g:render template="/template/first-artist" model="[artist: artist, firstArtistSongs: firstArtistSongs]"/>
@@ -92,8 +92,20 @@
 		                  <div class="tab-pane" id="tab-release">
 		                    	<g:each in="${releases}" var="release" status="releaseCounter">
 		                  			<% 
-								   		ArrayList<String> releaseSongs = release.getSplittedFields(release.releaseSongs);
-								   		ArrayList<String> releaseSongIDs = release.getSplittedFields(release.releaseSongIDs);
+								   		ArrayList<String> releaseSongsTmp = release.getSplittedFields(release.releaseSongs);
+								   		ArrayList<String> releaseSongIDsTmp = release.getSplittedFields(release.releaseSongIDs);
+									    ArrayList<String> releaseSongs = new ArrayList<String>();
+									    ArrayList<String> releaseSongIDs = new ArrayList<String>();
+										   
+										Set<String> releaseSongsSet = new HashSet<String>();
+										for(int i = 0 ; i < releaseSongsTmp.size(); i++) {
+											if (!releaseSongsSet.contains(songString)) {
+												releaseSongsSet.add(releaseSongsTmp.get(i));
+												releaseSongs.add(releaseSongsTmp.get(i));
+												releaseSongIDs.add(releaseSongIDsTmp.get(i));
+											}
+										}   
+										
 									 %>
 		                  			<g:if test="${releaseCounter==0}">
 		                  				<g:render template="/template/first-release" model="[release: release, releaseSongs: releaseSongs, releaseSongIDs : releaseSongIDs]"/>
@@ -117,8 +129,8 @@
 			                
 			                <g:if test="${artists.size() > 0}">
 				                <div class="box-body artist-recomendation-wrapper" artist-id="${artists.get(0).artistID}">
-				                	<div class="clearfix"></div>
-				                 	<div class="overlay centered" style="height: 30px; position: relative;"><i class="fa fa-circle-o-notch fa-spin"></i></div>
+					                	<div class="clearfix"></div>
+					                 	<div class="overlay centered" style="height: 30px; position: relative;"><i class="fa fa-circle-o-notch fa-spin"></i></div>
 				                </div><!-- /.box-body -->
 				                <script type="text/javascript">
 					                function initRecommendation() {
@@ -211,6 +223,8 @@
 			initModalEntity();
 
 			initRecording();
+
+			initLoadAllArtistSongs();
 		});
 
 		function initAutocomplete() {
@@ -242,6 +256,9 @@
 
 		function initModalEntity() {
 			$('#entity-modal').modal({show : false})
+			$('#entity-modal').on('hide.bs.modal', function (e) {
+				$('#entity-modal .modal-body').html("");
+			});
 			$("a.load-document-id").unbind('click').click(function(e){
 				var entityID = $(this).attr("entity-id")
 				$.ajax({
@@ -256,6 +273,7 @@
 					success: function(data) {
 						$('#entity-modal .modal-body').html(data.data)
 						$('#entity-modal .modal-title').html(data.entityName);
+						initLoadAllArtistSongs();
 					}
 				});
 			});

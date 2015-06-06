@@ -1,3 +1,4 @@
+<%@page import="java.text.DecimalFormat"%>
 <div class="box box-success">
 	<div class="box-header with-border">
 		<h3 class="box-title"><strong>${artist.artistName}</strong></h3>
@@ -29,7 +30,11 @@
 	       				<td><b>Rating:</b></td>
 	       				<td>
 	       					<g:if test="${artist.artistRating != Integer.MAX_VALUE}">
-       							${artist.artistRating}
+	       						<% 
+								   DecimalFormat df = new DecimalFormat();
+								   df.setMaximumFractionDigits(0);
+	       						%>
+       							${df.format(artist.getArtistRating())}
        						</g:if>
 	       				</td>
 	       			</tr>
@@ -81,32 +86,8 @@
       			</g:else>
       		</div>
        
-        <div class="col-lg-6" style="max-height: 200px; overflow: auto;">
-        	<g:if test="${firstArtistSongs.size() > 0}">
-	        	<table class="table">
-	        		<tr>
-	        			<th>#</th>
-	        			<th>Songs of ${artist.artistName}</th>
-	        		</tr>
-	        		
-	        		<g:each in="${firstArtistSongs}" var="artistSong" status="songArtistCounter">
-	        			<g:if test="${artistSong != null}">
-		        			<tr>
-		        				<td>${songArtistCounter + 1}</td>
-		        				<td>
-		        					<a href="javascript:void(0)" class="load-document-id" entity-id="${artistSong.documentID}">${artistSong.songTitle}</a>
-		        				</td>
-		        			</tr>
-	        			</g:if>
-	        		</g:each>
-	        	</table>
-	        </g:if>
-	        <g:else>
-	        	  <div class="alert alert-info alert-dismissable centered">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                    <h4 style="margin:0"><i class="icon fa fa-info"></i> No song found for this artist.</h4>
-                  </div>
-	        </g:else>
+         <div  class="col-lg-6 all-artist-song" style="max-height: 200px; overflow: auto;">
+        		<g:render template="/template/first-artist-songs" model="[firstArtistSongs: firstArtistSongs]"/>
       	 </div>
        </div>
        	</div><!-- /.box-body -->

@@ -1,7 +1,6 @@
 <div class="callout result-item result-release">
 	<h4><a entity-id="${release.documentID}" class="load-document-id" href="javascript:void(0)">${release.releaseName}</a></h4>
 	<div>Type: ${release.releaseType}</div>
-	<div>Artist: ${release.releaseArtist}</div>
 	<div>
 		#Song:
 		<g:if test="${release.releaseSongs.equals("")}">

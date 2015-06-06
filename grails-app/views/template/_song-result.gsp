@@ -8,7 +8,12 @@
 						                    		Artist:
 						                    		<g:each in="${songArtists}" var="artist" status="artistCounter">
 						                    			<g:if test="${i>0}">,&nbsp;</g:if>
-						                    			<a entity-id="artist_${songArtistIDs.get(artistCounter)}" class="load-document-id" href="javascript:void(0)">${artist}</a>
+						                    			<g:if test="${artist.equalsIgnoreCase('others')}">
+						      								${artist}
+						      							</g:if>
+						      							<g:if test="${!artist.equalsIgnoreCase('others')}">
+						      								<a entity-id="artist_${songArtistIDs.get(artistCounter)}" class="load-document-id" href="javascript:void(0)">${artist}</a>
+						      							</g:if>
 						                    		</g:each> 
 						                    	</div>
 						                    	<div>Duration:
