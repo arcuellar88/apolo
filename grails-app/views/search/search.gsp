@@ -99,8 +99,9 @@
 										   
 										Set<String> releaseSongsSet = new HashSet<String>();
 										for(int i = 0 ; i < releaseSongsTmp.size(); i++) {
-											if (!releaseSongsSet.contains(songString)) {
-												releaseSongsSet.add(releaseSongsTmp.get(i));
+											String songName = releaseSongsTmp.get(i);
+											if (!releaseSongsSet.contains(songName)) {
+												releaseSongsSet.add(songName);
 												releaseSongs.add(releaseSongsTmp.get(i));
 												releaseSongIDs.add(releaseSongIDsTmp.get(i));
 											}

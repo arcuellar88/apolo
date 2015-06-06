@@ -70,19 +70,19 @@ class SearchController extends BaseController {
 			Searcher songSearcher = new Searcher(Global_Configuration.INDEX_DIRECTORY, indexSearcher)
 			songSearcher.addQuery("song", "type", Occur.MUST)
 			songSearcher.setPage(1)
-			songSearcher.setResultPerPage(10)
+			songSearcher.setResultPerPage(40)
 			
 			//Searcher for release
 			Searcher releaseSearcher = new Searcher(Global_Configuration.INDEX_DIRECTORY, indexSearcher)
 			releaseSearcher.addQuery("release", "type", Occur.MUST)
 			releaseSearcher.setPage(1)
-			releaseSearcher.setResultPerPage(10)
+			releaseSearcher.setResultPerPage(15)
 			
 			//Searcher for artist
 			Searcher artistSearcher = new Searcher(Global_Configuration.INDEX_DIRECTORY, indexSearcher)
 			artistSearcher.addQuery("artist", "type", Occur.MUST)
 			artistSearcher.setPage(1)
-			artistSearcher.setResultPerPage(10)
+			artistSearcher.setResultPerPage(15)
 			
 			println "INIT SEARCHERS: " + ((System.currentTimeMillis() - start)) * 1.0 / 1000
 			start = System.currentTimeMillis()
@@ -251,7 +251,6 @@ class SearchController extends BaseController {
 		ApoloDocument entity = searcher.getResults().get(0)
 		
 		getDBPediaInfo(entity)
-		print "TYPEEEEEEEEEEEE: " + entity.getType();
 		if (entity.getType().equalsIgnoreCase("song")) {
 			//Youtube link
 			String youtubeURL = getYouTubeURL(entity)
@@ -292,11 +291,11 @@ class SearchController extends BaseController {
 	
 	public getAllArtistSong() {
 		String artistID = params.artistID
-		model = [:]
+		def model = [:]
 		ApoloDocument artist = new ApoloDocument();
 		artist.setArtistID(artistID);
-		model.firstArtistSongs = getFirstArtistSongs(artist, 100000)
-		data = g.render(template : "/template/_first-artist-songs" , model : model);
+		model.firstArtistSongs = getFirstArtistSongs(artist, 10000)
+		def data = g.render(template : "/template/first-artist-songs" , model : model);
 		def json = [data : data]
 		render json as JSON
 	}
@@ -321,13 +320,14 @@ class SearchController extends BaseController {
 		
 		Set<String> songTitles = new HashSet<String>();
 		ArrayList<ApoloDocument> results = searcher.getResults()
+		ArrayList<ApoloDocument> finalResults = new ArrayList<ApoloDocument>();
 		
 		for(ApoloDocument adocument : results) {
-			songTitles.add(adocument.getSongTitle());
+			if (!songTitles.contains(adocument.getSongTitle())) {
+				songTitles.add(adocument.getSongTitle());
+				finalResults.add(adocument);
+			}
 		}
-		
-		ArrayList<ApoloDocument> finalResults = new ArrayList<ApoloDocument>();
-		finalResults.addAll(songTitles);
 		return finalResults;
 	}
 	

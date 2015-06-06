@@ -2,7 +2,7 @@
 	        	<table class="table">
 	        		<tr>
 	        			<th>#</th>
-	        			<th>Songs of ${artist.artistName}</th>
+	        			<th>Songs</th>
 	        		</tr>
 	        		
 	        		<g:each in="${firstArtistSongs}" var="artistSong" status="songArtistCounter">
@@ -17,7 +17,7 @@
 	        		</g:each>
 	        	</table>
 	        	<g:if test="${artist != null}">
-		        	<div style="width: 100%; margin-top: 5px;">
+		        	<div style="width: 100%; margin-top: 5px; tex-align: center" >
 	        			<a artistID="${artist.artistID}" class="view-all-song-btn" href="javascript:void(0)">View all song</a>
 	        		</div>
 	        	</g:if>

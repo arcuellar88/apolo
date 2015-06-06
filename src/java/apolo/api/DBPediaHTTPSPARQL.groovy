@@ -36,7 +36,7 @@ public class DPPediaHTTPSPARQL implements IDBpedia {
 					"&format=" + URLEncoder.encode(format, "UTF-8") +
 					"&timeout=" + timeout +
 					"&debug=" + debug;
-
+					
 			HttpClient client = HttpClientBuilder.create().build();
 			HttpGet request = new HttpGet(finalUrl);
 			HttpResponse response;

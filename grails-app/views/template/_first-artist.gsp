@@ -87,7 +87,7 @@
       		</div>
        
          <div  class="col-lg-6 all-artist-song" style="max-height: 200px; overflow: auto;">
-        		<g:render template="/template/first-artist-songs" model="[firstArtistSongs: firstArtistSongs]"/>
+        		<g:render template="/template/first-artist-songs" model="[artist: artist, firstArtistSongs: firstArtistSongs]"/>
       	 </div>
        </div>
        	</div><!-- /.box-body -->
