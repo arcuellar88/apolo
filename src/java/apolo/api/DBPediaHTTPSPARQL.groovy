@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -29,6 +30,13 @@ public class DPPediaHTTPSPARQL implements IDBpedia {
 
 	public String makeQuery(String query) {
 		try {
+			
+			int CONNECTION_TIMEOUT = timeout * 2000; // timeout in millis
+			RequestConfig requestConfig = RequestConfig.custom()
+				.setConnectionRequestTimeout(CONNECTION_TIMEOUT)
+				.setConnectTimeout(CONNECTION_TIMEOUT)
+				.setSocketTimeout(CONNECTION_TIMEOUT)
+				.build();
 
 			String finalUrl =     baseUrl +
 					"?default-graph-uri=" + URLEncoder.encode("http://dbpedia.org", "UTF-8") +
@@ -39,6 +47,7 @@ public class DPPediaHTTPSPARQL implements IDBpedia {
 					
 			HttpClient client = HttpClientBuilder.create().build();
 			HttpGet request = new HttpGet(finalUrl);
+			request.setConfig(requestConfig);
 			HttpResponse response;
 			response = client.execute(request);
 			return  EntityUtils.toString(response.getEntity());
@@ -108,7 +117,7 @@ public class DPPediaHTTPSPARQL implements IDBpedia {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace()
+			//e.printStackTrace()
 		}
 
 		return a
@@ -142,7 +151,7 @@ public class DPPediaHTTPSPARQL implements IDBpedia {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace()
+			//e.printStackTrace()
 		}
 
 		return s
@@ -174,7 +183,7 @@ public class DPPediaHTTPSPARQL implements IDBpedia {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace()
+			//e.printStackTrace()
 		}
 
 		return  r

@@ -16,6 +16,9 @@
 </head>
 <body>
   <div class="body">
+  		<div class="row centered" style="margin-bottom: 10px;">
+  			<a target="_blank" href="https://www.surveymonkey.com/s/R3PXCYR">Help us improve the system by completing this survey.</a>
+  		</div> 
   		<div class="row">
 			<div class="col-lg-3"></div>
 				<div class="col-lg-6">
@@ -257,7 +260,7 @@
 
 		function initModalEntity() {
 			$('#entity-modal').modal({show : false})
-			$('#entity-modal').on('hide.bs.modal', function (e) {
+			$('#entity-modal').on('hidden.bs.modal', function (e) {
 				$('#entity-modal .modal-body').html("");
 			});
 			$("a.load-document-id").unbind('click').click(function(e){

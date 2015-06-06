@@ -119,6 +119,9 @@ class SearchController extends BaseController {
 					//Additional information
 					releaseSearcher.addQuery(anno.getEntityValue(), "releaseArtists", Occur.SHOULD)
 					
+					//Additional information for song
+					songSearcher.addQuery(anno.getEntityValue(), "songArtists", Occur.SHOULD, (float)1.5)
+					
 					existArtistAnno = true
 				}
 			}
@@ -328,6 +331,18 @@ class SearchController extends BaseController {
 				finalResults.add(adocument);
 			}
 		}
+		
+		Collections.sort(finalResults, new Comparator<ApoloDocument>() {
+			@Override public int compare(final ApoloDocument d1, final ApoloDocument d2) {
+			  if (d1.getSongTitle() > d2.getSongTitle()) {
+				return 1;
+			  } else if (d1.getSongTitle() < d2.getSongTitle()) {
+				return -1;
+			  }
+			  return 0;
+			}
+		});
+		
 		return finalResults;
 	}
 	
