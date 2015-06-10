@@ -316,7 +316,7 @@ public class NER {
 		double transposeWeight = Double.NaN;
 		
 		WeightedEditDistance editDistance = new FixedWeightEditDistance(matchWeight,deleteWeight,insertWeight,substituteWeight,transposeWeight);
-		double maxDistance = 2.0;
+		double maxDistance = 1.0;
         this.dictionaryChunkerApp = new ApproxDictionaryChunker(dictionaryApprox,LineTokenizerFactory.INSTANCE,editDistance,maxDistance);
 		
 		
@@ -356,14 +356,15 @@ public class NER {
 	
 	
 	public static void main(String args[]){
-		String q[] = {	//"\"Pearl Jam\" Queen", "Taylor Swift", "a world without us",
-						//"pearl jam", "shakira", "Shakira",
-						//"\"A night at the Opera\"", "\"Silver Spoons & Broken Bones\"",
-						//"\"Silver Spoons\" & \"Broken Bones\"", "\"Bohemian Rhapsody\"",
-						//"A night at the Opera", "silver spoons & broken bones",
-						//"Shakira in 2007", "2007", 
+		String q[] = {	"\"Pearl Jam\" Queen", "Taylor Swift", "a world without us",
+						"pearl jam", "shakira", "Shakira",
+						"\"A night at the Opera\"", "\"Silver Spoons & Broken Bones\"",
+						"\"Silver Spoons\" & \"Broken Bones\"", "\"Bohemian Rhapsody\"",
+						"A night at the Opera", "silver spoons & broken bones",
+						"Shakira in 2007", "2007", 
 						"of", "\"I\"", "\"Now\"", "\"Now I do\"", "Like you do",
-						"Songs of \"Shakira\" that were released in 2007"
+						"Songs of \"Shakira\" that were released in 2007",
+						"I Knowssa", "Knowssa", "\"Knowssa\""
 						
 				};
 		
