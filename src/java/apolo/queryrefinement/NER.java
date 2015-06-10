@@ -15,9 +15,6 @@ import com.aliasi.dict.TrieDictionary;
 import com.aliasi.io.FileLineReader;
 import com.aliasi.spell.FixedWeightEditDistance;
 import com.aliasi.spell.WeightedEditDistance;
-import com.aliasi.tokenizer.IndoEuropeanTokenizerFactory;
-
-
 
 
 
@@ -147,7 +144,7 @@ public class NER {
 		            int end = chunk.end();
 					String phrase = text.substring(start,end);
 					//System.out.println(phrase);
-		            if(phrase.equalsIgnoreCase(text)){
+		            if(phrase.equalsIgnoreCase(text) && !isStopWord(phrase.toLowerCase())){
 			            String type = chunk.type();
 		            	annotations.add(new Annotation(phrase,type,start,end,0,phrase.length()));
 		            }
@@ -359,12 +356,13 @@ public class NER {
 	
 	
 	public static void main(String args[]){
-		String q[] = {	"\"Pearl Jam\" Queen", "Taylor Swift", "a world without us",
-						"pearl jam", "shakira", "Shakira",
-						"\"A night at the Opera\"", "\"Silver Spoons & Broken Bones\"",
-						"\"Silver Spoons\" & \"Broken Bones\"", "\"Bohemian Rhapsody\"",
-						"A night at the Opera", "silver spoons & broken bones",
-						"Shakira in 2007", "2007", "of", "\"I\"", "\"Now\"", "\"Now I do\"", "Like you do",
+		String q[] = {	//"\"Pearl Jam\" Queen", "Taylor Swift", "a world without us",
+						//"pearl jam", "shakira", "Shakira",
+						//"\"A night at the Opera\"", "\"Silver Spoons & Broken Bones\"",
+						//"\"Silver Spoons\" & \"Broken Bones\"", "\"Bohemian Rhapsody\"",
+						//"A night at the Opera", "silver spoons & broken bones",
+						//"Shakira in 2007", "2007", 
+						"of", "\"I\"", "\"Now\"", "\"Now I do\"", "Like you do",
 						"Songs of \"Shakira\" that were released in 2007"
 						
 				};
