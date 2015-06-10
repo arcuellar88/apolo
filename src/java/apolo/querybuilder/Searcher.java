@@ -69,8 +69,11 @@ public class Searcher implements ISearcher {
 	 * @throws Exception
 	 */
 	
-	public void addQuery(String keyword , String searchField, Occur occur, float boostingScore) throws Exception {
-		String escapeKeyword =  QueryParser.escape(keyword);
+	public void addQuery(boolean escape, String keyword , String searchField, Occur occur, float boostingScore) throws Exception {
+		String escapeKeyword = keyword;
+		if (escape) {
+			escapeKeyword =  QueryParser.escape(keyword);
+		}
 		Query query = new QueryParser(Version.LUCENE_46, searchField, analyzer).parse(escapeKeyword.toLowerCase());
 		query.setBoost(boostingScore);
 		booleanQuery.add(query, occur);
@@ -84,8 +87,11 @@ public class Searcher implements ISearcher {
 	 * @throws ParseException
 	 */
 	
-	public void addQuery(String keyword , String searchField, Occur occur) throws Exception {
-		String escapeKeyword =  QueryParser.escape(keyword);
+	public void addQuery(boolean escape, String keyword , String searchField, Occur occur) throws Exception {
+		String escapeKeyword = keyword;
+		if (escape) {
+			escapeKeyword =  QueryParser.escape(keyword);
+		}
 		Query query = new QueryParser(Version.LUCENE_46, searchField, analyzer).parse(escapeKeyword.toLowerCase());
 		booleanQuery.add(query, occur);
 	}
@@ -102,9 +108,9 @@ public class Searcher implements ISearcher {
 	 * @throws ParseException
 	 */
 	
-	public void addQuery(ArrayList<String> keywords , String searchField, Occur occur) throws Exception {
+	public void addQuery(boolean escape, ArrayList<String> keywords , String searchField, Occur occur) throws Exception {
 		for (String keyword : keywords) {
-			addQuery(keyword, searchField, occur);
+			addQuery(escape, keyword, searchField, occur);
 		}
 	}
 	

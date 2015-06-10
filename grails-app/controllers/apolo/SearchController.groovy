@@ -1,6 +1,7 @@
 package apolo
 
 import java.io.File;
+import java.util.ArrayList;
 
 import org.apache.lucene.search.IndexSearcher
 import org.apache.lucene.search.BooleanClause.Occur;
@@ -68,19 +69,19 @@ class SearchController extends BaseController {
 			
 			//init searcher for song
 			Searcher songSearcher = new Searcher(Global_Configuration.INDEX_DIRECTORY, indexSearcher)
-			songSearcher.addQuery("song", "type", Occur.MUST)
+			songSearcher.addQuery(false, "song", "type", Occur.MUST)
 			songSearcher.setPage(1)
 			songSearcher.setResultPerPage(30)
 			
 			//Searcher for release
 			Searcher releaseSearcher = new Searcher(Global_Configuration.INDEX_DIRECTORY, indexSearcher)
-			releaseSearcher.addQuery("release", "type", Occur.MUST)
+			releaseSearcher.addQuery(false, "release", "type", Occur.MUST)
 			releaseSearcher.setPage(1)
 			releaseSearcher.setResultPerPage(15)
 			
 			//Searcher for artist
 			Searcher artistSearcher = new Searcher(Global_Configuration.INDEX_DIRECTORY, indexSearcher)
-			artistSearcher.addQuery("artist", "type", Occur.MUST)
+			artistSearcher.addQuery(false, "artist", "type", Occur.MUST)
 			artistSearcher.setPage(1)
 			artistSearcher.setResultPerPage(15)
 			
@@ -92,30 +93,55 @@ class SearchController extends BaseController {
 			boolean existArtistAnno = false
 			
 			//Get annotation
-			ArrayList<Annotation> annotations = ner.annotateQuery(query)
-			print "ANNOTATION SIZE: " + annotations.size()
+			ArrayList<Annotation> annotations = getAnnotations(query)
+			println "ANNOTATION SIZE: " + annotations.size()
+			
+			String stringSongs = "";
+			String stringArtists = "";
+			String stringReleases = "";
+			String stringYears = "";
+			
 			for(Annotation anno : annotations) {
 				println anno.getEntityType() + " " + anno.getEntityValue()
 				if (anno.getEntityType().equalsIgnoreCase("SONG")) {
+					
+					if (stringSongs.size() > 0) {
+						stringSongs += " OR";
+					}
+					stringSongs += " \"" + anno.getEntityValue() + "\"";
+					
+					/*
 					//Main search
 					songSearcher.addQuery(anno.getEntityValue(), "songTitle", Occur.SHOULD, (float)10)
 					
 					//Additional information
 					releaseSearcher.addQuery(anno.getEntityValue(), "releaseSongs", Occur.SHOULD)
-					
+					*/
 					existSongAnno = true
 				}
 				else if (anno.getEntityType().equalsIgnoreCase("RELEASE")) {
+					if (stringReleases.size() > 0) {
+						stringReleases += " OR";
+					}
+					stringReleases += " \"" + anno.getEntityValue() + "\"";
+					
+					/*
 					//Main search
 					releaseSearcher.addQuery(anno.getEntityValue(), "releaseName", Occur.SHOULD, (float)2)
 					
 					//Additional information
 					//songSearcher.addQuery(anno.getEntityValue(), "songReleaseName", Occur.SHOULD)
-					
+					*/
 					existReleaseAnno = true
 				}
 				else if (anno.getEntityType().equalsIgnoreCase("ARTIST")) {
 					
+					if (stringArtists.size() > 0) {
+						stringArtists += " OR";
+					}
+					stringArtists += " \"" + anno.getEntityValue() + "\"";
+					
+					/*
 					//Main search
 					artistSearcher.addQuery(anno.getEntityValue(), "artistName", Occur.SHOULD, (float)2)
 					
@@ -125,9 +151,43 @@ class SearchController extends BaseController {
 					//Additional information for song
 					println "ADD song of artist: " + anno.getEntityValue()
 					songSearcher.addQuery("\"" + anno.getEntityValue() + "\"", "songArtists", Occur.MUST)
+					*/
 					
 					existArtistAnno = true
+				} else if (anno.getEntityType().equalsIgnoreCase("YEAR")) {
+					if (stringYears.size() > 0) {
+						stringYears += " OR";
+					}
+					stringYears += " \"" + anno.getEntityValue() + "\"";
 				}
+			}
+			
+			stringSongs = stringSongs.trim()
+			stringReleases = stringReleases.trim()
+			stringArtists = stringArtists.trim()
+			stringYears = stringYears.trim()
+			
+			println "String Songs: " + stringSongs
+			println "String Releases: " + stringReleases
+			println "String Artists: " + stringArtists
+			println "String Years: " + stringYears
+			
+			if (stringSongs.size() > 0) {
+				songSearcher.addQuery(false, "songTitle", stringSongs, Occur.MUST, (float)2)
+				releaseSearcher.addQuery(false, stringSongs, "releaseSongs", Occur.SHOULD)
+			}
+			
+			if (stringReleases.size() > 0) {
+				releaseSearcher.addQuery(false, stringReleases, spellingCorrectedString, Occur.MUST)
+			}
+			
+			if (stringArtists.size() > 0) {
+				artistSearcher.addQuery(false, stringArtists, "artistName", Occur.MUST, (float)2)
+				songSearcher.addQuery(false, "songArtists", stringSongs , Occur.SHOULD, (float)5)
+			}
+			
+			if (stringYears.size() > 0) {
+				songSearcher.addQuery(false, "songYear", stringYears , Occur.SHOULD, (float)5)
 			}
 			
 			println "BUILD QUERY ANNOTATIONS: " + ((System.currentTimeMillis() - start)) * 1.0 / 1000
@@ -135,28 +195,28 @@ class SearchController extends BaseController {
 			
 			//Check if annotation for song/artist/release exist, if not we need to relax the query criteria
 			if (!existSongAnno) {
-				songSearcher.addQuery(query, "songTitle", Occur.SHOULD, (float)5)
+				songSearcher.addQuery(true, query, "songTitle", Occur.SHOULD, (float)5)
 				//songSearcher.addQuery("\"" + query + "\"", "songTitle", Occur.MUST, (float)10)
-				songSearcher.addQuery(query, "songGenres", Occur.SHOULD)
+				songSearcher.addQuery(true, query, "songGenres", Occur.SHOULD)
 				//songSearcher.addQuery(query, "songLyrics", Occur.SHOULD)
-				songSearcher.addQuery(query, "songCountries", Occur.SHOULD)
-				songSearcher.addQuery(query, "songContinents", Occur.SHOULD)
+				songSearcher.addQuery(true, query, "songCountries", Occur.SHOULD)
+				songSearcher.addQuery(true, query, "songContinents", Occur.SHOULD)
 			}
 			
 			if (!existReleaseAnno) {
-				releaseSearcher.addQuery(query, "releaseName", Occur.SHOULD, (float)1.5)
-				releaseSearcher.addQuery(query, "releaseType", Occur.SHOULD)
-				releaseSearcher.addQuery(query, "releaseSongs", Occur.SHOULD)
-				releaseSearcher.addQuery(query, "releaseArtists", Occur.SHOULD)
+				releaseSearcher.addQuery(true, query, "releaseName", Occur.SHOULD, (float)1.5)
+				releaseSearcher.addQuery(true, query, "releaseType", Occur.SHOULD)
+				releaseSearcher.addQuery(true, query, "releaseSongs", Occur.SHOULD)
+				releaseSearcher.addQuery(true, query, "releaseArtists", Occur.SHOULD)
 			}
 			
 			if (!existArtistAnno) {
-				artistSearcher.addQuery(query, "artistName", Occur.SHOULD, (float)1.5)
-				artistSearcher.addQuery("\"" + query + "\"", "artistName", Occur.MUST, (float)1.5)
-				artistSearcher.addQuery(query, "artistType", Occur.SHOULD)
-				artistSearcher.addQuery(query, "artistGender", Occur.SHOULD)
-				artistSearcher.addQuery(query, "artistCountry", Occur.SHOULD)
-				artistSearcher.addQuery(query, "artistContinent", Occur.SHOULD)
+				artistSearcher.addQuery(true, query, "artistName", Occur.SHOULD, (float)1.5)
+				//artistSearcher.addQuery("\"" + query + "\"", "artistName", Occur.MUST, (float)1.5)
+				artistSearcher.addQuery(true, query, "artistType", Occur.SHOULD)
+				artistSearcher.addQuery(true, query, "artistGender", Occur.SHOULD)
+				artistSearcher.addQuery(true, query, "artistCountry", Occur.SHOULD)
+				artistSearcher.addQuery(true, query, "artistContinent", Occur.SHOULD)
 			}
 			
 			println "BUILD QUERY NO ANNOTATIONS: " + ((System.currentTimeMillis() - start)) * 1.0 / 1000
@@ -240,6 +300,78 @@ class SearchController extends BaseController {
 		start = System.currentTimeMillis()
 	}
 	
+	public ArrayList<Annotation> getAnnotations(String query) {
+		ArrayList<Annotation> annotations = new ArrayList<Annotation>()
+		NER ner = servletContext.getAttribute("ner");
+		query = query.trim();
+		String[] terms = query.split("\\s+");
+		for (int i = 0 ; i < terms.length; i++) {
+			for(int j = i ; j <  terms.length; j++) {
+				String candidate = "";
+				for(int t = i; t <= j; t++) {
+					candidate += terms[t] + " "
+				}
+				candidate = candidate.trim()
+				if (candidate.length() >= 0) {
+					ArrayList<Annotation> tmpAnno = ner.annotateQuery(candidate);
+					if (tmpAnno.size() > 0) {
+						annotations.addAll(tmpAnno)
+					}
+				}
+			}
+		}
+		
+		Map<String, String> checkUniqueArtists = new HashMap<String, String>();
+		Map<String, String> checkUniqueSongs = new HashMap<String, String>();
+		Map<String, String> checkUniqueReleases = new HashMap<String, String>();
+		Map<String, String> checkUniqueYears = new HashMap<String, String>();
+		
+		//Only get annotation with value exist in query
+		ArrayList<Annotation> finalAnnotations = new ArrayList<Annotation>()
+		String tmpQuery = query.trim().toLowerCase();
+		for(int i = 0; i < annotations.size(); i++ ) {
+			String v = annotations.get(i).entityValue.toLowerCase();
+			Annotation an = annotations.get(i);
+			if (query.indexOf(v) >= 0) {
+				
+				//Check unique song
+				if (an.getEntityType().equalsIgnoreCase("SONG")) {
+					if (checkUniqueSongs.containsKey(an.getEntityValue())) {
+						continue;
+					}
+					checkUniqueSongs.put(an.getEntityValue(), an.getEntityType())
+				}
+				
+				//Check unique artist
+				if (an.getEntityType().equalsIgnoreCase("ARTIST")) {
+					if (checkUniqueArtists.containsKey(an.getEntityValue())) {
+						continue;
+					}
+					checkUniqueArtists.put(an.getEntityValue(), an.getEntityType())
+				}
+				
+				//Check unique release
+				if (an.getEntityType().equalsIgnoreCase("RELEASE")) {
+					if (checkUniqueReleases.containsKey(an.getEntityValue())) {
+						continue;
+					}
+					checkUniqueReleases.put(an.getEntityValue(), an.getEntityType())
+				}
+				
+				//Chekc unique year
+				if (an.getEntityType().equalsIgnoreCase("YEAR")) {
+					if (checkUniqueYears.containsKey(an.getEntityValue())) {
+						continue;
+					}
+					checkUniqueYears.put(an.getEntityValue(), an.getEntityType())
+				}
+				
+				finalAnnotations.add(annotations.get(i));
+			}
+		}
+		return finalAnnotations
+	}
+	
 	def getEntity() {
 		
 		IndexSearcher indexSearcher = servletContext.getAttribute("indexSearcher")
@@ -253,7 +385,7 @@ class SearchController extends BaseController {
 		Searcher searcher = new Searcher(Global_Configuration.INDEX_DIRECTORY, indexSearcher)
 		searcher.setPage(1)
 		searcher.setResultPerPage(10)
-		searcher.addQuery(entityID.trim(), "documentID", Occur.MUST)
+		searcher.addQuery(true, entityID.trim(), "documentID", Occur.MUST)
 		
 		searcher.execute()
 		
@@ -321,8 +453,8 @@ class SearchController extends BaseController {
 		IndexSearcher indexSearcher = servletContext.getAttribute("indexSearcher")
 		
 		Searcher searcher = new Searcher(Global_Configuration.INDEX_DIRECTORY, indexSearcher)
-		searcher.addQuery(artist.getArtistID(), "songArtistsID", Occur.MUST)
-		searcher.addQuery("song", "type", Occur.MUST)
+		searcher.addQuery(true, artist.getArtistID(), "songArtistsID", Occur.MUST)
+		searcher.addQuery(true, "song", "type", Occur.MUST)
 		searcher.setPage(1)
 		searcher.setResultPerPage(limit)
 		searcher.execute()
@@ -473,8 +605,11 @@ class SearchController extends BaseController {
 		String artistID = params.artistID
 		ApoloDocument document = new ApoloDocument()
 		document.setArtistID(artistID)
-		
-		model.recommendedArtists = getRecommendation(document)
+		try {
+			model.recommendedArtists = getRecommendation(document)
+		} catch (Exception e) {
+		model.recommendedArtists = ""
+		}
 		
 		println "RETRIEVE RECOMMENDATION FOR FIRST ARTIST: " + ((System.currentTimeMillis() - start)) * 1.0 / 1000
 		start = System.currentTimeMillis()
