@@ -206,7 +206,7 @@ public class NER {
 		for(int i=0; i< elems.length; i++){
 			try{
 				int year = Integer.parseInt(elems[i]);
-				if(year > 1940 && year < 2050){
+				if(year > 1840 && year < 2050){
 					int start = q.indexOf(year+"");
 					int end = start+3;
 					annotations.add(new Annotation(year+"","YEAR",start,end,0,4));
