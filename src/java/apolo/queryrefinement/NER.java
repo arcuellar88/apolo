@@ -42,6 +42,7 @@ public class NER {
 	//ExactDictionaryChunker dictionaryChunkerExact;
 	ApproxDictionaryChunker dictionaryChunkerApp;
 	private static final double CHUNK_SCORE = 1.0;
+	private Map<String, Integer> stopwords;
 	
 	public NER(){
 		this.query="";
@@ -64,8 +65,29 @@ public class NER {
         } catch (Exception ex) {
             // handle the error
         }
-		
+		loadStopWords();
 		loadDictionaryFromDB();
+	}
+	
+	private void loadStopWords(){
+		this.stopwords = new HashMap<String,Integer>();
+		String path = System.getProperty("user.dir");
+		String fullpath = path + File.separator + "data" + File.separator;
+    	
+		//String fullpath = Global_Configuration.DATA_FOLDER + File.separator;
+		File sw = new File(fullpath+"stopwords.txt");
+		String[] lines = null;
+		try{
+		lines = FileLineReader.readLineArray(sw,"UTF-8");
+		if(lines != null){
+			for(String stw : lines){
+				this.stopwords.put(stw,1);
+			}
+		}
+			
+		}catch(IOException ioe){
+			System.out.println("ERROR: problem reading stopwords file");
+		}
 	}
 	
 	public NER(String query){
@@ -79,6 +101,7 @@ public class NER {
 		this.clases.add("ARTIST");
 		this.clases.add("RELEASE");
 		//this.clases.add("SONG");
+		loadStopWords();
 		loadDictionaryFromDB();
 	}
 	
@@ -163,6 +186,9 @@ public class NER {
 			String c2 = getString(chunk2);
 			if((c2.contains(c1) && !c2.equals(c1)) || c1.contains("\"")){
 				add=false;
+			}
+			if(isStopWord(c2.toLowerCase())){
+					add=false;
 			}
 		}
 		return add;
@@ -318,15 +344,29 @@ public class NER {
 		return conn;
 	}
 	
+	private boolean isStopWord(String v){
+		boolean isStopWord = false;
+		v = v.replace("\"", "");
+		if(v.charAt(v.length()-1)==' '){
+			v = v.substring(0, v.length()-1);
+		}
+		if(this.stopwords.containsKey(v)){
+			isStopWord = true;
+		}
+		return isStopWord;
+	}
 	
-	/*
+	
 	
 	public static void main(String args[]){
 		String q[] = {	"\"Pearl Jam\" Queen", "Taylor Swift", "a world without us",
+						"pearl jam", "shakira", "Shakira",
 						"\"A night at the Opera\"", "\"Silver Spoons & Broken Bones\"",
 						"\"Silver Spoons\" & \"Broken Bones\"", "\"Bohemian Rhapsody\"",
 						"A night at the Opera", "silver spoons & broken bones",
-						"Shakira in 2007", "2007"
+						"Shakira in 2007", "2007", "of", "\"I\"", "\"Now\"", "\"Now I do\"", "Like you do",
+						"Songs of \"Shakira\" that were released in 2007"
+						
 				};
 		
 		NER n = new NER();
@@ -349,5 +389,5 @@ public class NER {
 			}
 		}
 	}
-	*/
+	
 }
