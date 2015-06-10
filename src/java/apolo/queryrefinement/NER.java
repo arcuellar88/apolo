@@ -319,7 +319,7 @@ public class NER {
 	}
 	
 	
-	
+	/*
 	
 	public static void main(String args[]){
 		String q[] = {	"\"Pearl Jam\" Queen", "Taylor Swift", "a world without us",
@@ -349,5 +349,5 @@ public class NER {
 			}
 		}
 	}
-	
+	*/
 }
