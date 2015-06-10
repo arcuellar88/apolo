@@ -152,8 +152,43 @@ public class NER {
 	        	}
 	        }
 		}
-		
+		checkForYears(this.query, annotations);
 		return annotations;
+	}
+	
+	private boolean addAnnotation(Chunk chunk1, Chunking chunking, String t){
+		boolean add=true;
+		String c1 = getString(chunk1);
+		for (Chunk chunk2 : chunking.chunkSet()) {
+			String c2 = getString(chunk2);
+			if((c2.contains(c1) && !c2.equals(c1)) || c1.contains("\"")){
+				add=false;
+			}
+		}
+		return add;
+	}
+	
+	private String getString(Chunk chunk){
+		int start = chunk.start();
+        int end = chunk.end();
+		return this.query.substring(start,end);
+	}
+	
+	public void checkForYears(String q, ArrayList<Annotation> annotations){
+		q = q.replace("\"", "");
+		String elems[] = q.split("\\s");
+		for(int i=0; i< elems.length; i++){
+			try{
+				int year = Integer.parseInt(elems[i]);
+				if(year > 1940 && year < 2050){
+					int start = q.indexOf(year+"");
+					int end = start+3;
+					annotations.add(new Annotation(year+"","YEAR",start,end,0,4));
+				}
+				
+			}catch(Exception e){}
+		}
+		
 	}
 	
 	
@@ -251,7 +286,13 @@ public class NER {
 		System.out.println("finished loading NER dictionary");
 		//this.dictionaryChunkerExact = new ExactDictionaryChunker(dictionaryExact, IndoEuropeanTokenizerFactory.INSTANCE, false,false);
 		
-		WeightedEditDistance editDistance = new FixedWeightEditDistance(0,-1,-1,-1,Double.NaN);
+		double matchWeight = 0.0;
+		double insertWeight = -1.0;
+		double substituteWeight = -1.0;
+		double deleteWeight = -1.0;
+		double transposeWeight = Double.NaN;
+		
+		WeightedEditDistance editDistance = new FixedWeightEditDistance(matchWeight,deleteWeight,insertWeight,substituteWeight,transposeWeight);
 		double maxDistance = 2.0;
         this.dictionaryChunkerApp = new ApproxDictionaryChunker(dictionaryApprox,LineTokenizerFactory.INSTANCE,editDistance,maxDistance);
 		
@@ -277,30 +318,15 @@ public class NER {
 		return conn;
 	}
 	
-	private boolean addAnnotation(Chunk chunk1, Chunking chunking, String t){
-		boolean add=true;
-		String c1 = getString(chunk1);
-		for (Chunk chunk2 : chunking.chunkSet()) {
-			String c2 = getString(chunk2);
-			if((c2.contains(c1) && !c2.equals(c1)) || c1.contains("\"")){
-				add=false;
-			}
-		}
-		return add;
-	}
 	
-	private String getString(Chunk chunk){
-		int start = chunk.start();
-        int end = chunk.end();
-		return this.query.substring(start,end);
-	}
 	
-	/*
+	
 	public static void main(String args[]){
 		String q[] = {	"\"Pearl Jam\" Queen", "Taylor Swift", "a world without us",
 						"\"A night at the Opera\"", "\"Silver Spoons & Broken Bones\"",
 						"\"Silver Spoons\" & \"Broken Bones\"", "\"Bohemian Rhapsody\"",
-						"A night at the Opera", "silver spoons & broken bones"
+						"A night at the Opera", "silver spoons & broken bones",
+						"Shakira in 2007", "2007"
 				};
 		
 		NER n = new NER();
@@ -323,5 +349,5 @@ public class NER {
 			}
 		}
 	}
-	*/
+	
 }
