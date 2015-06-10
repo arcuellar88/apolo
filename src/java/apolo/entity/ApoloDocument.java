@@ -1,6 +1,8 @@
 package apolo.entity;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import apolo.msc.Global_Configuration;
 
@@ -128,6 +130,23 @@ public class ApoloDocument {
 				result.add(tmp[i].trim());
 			}
 		}
+		return result;
+	}
+	
+	public ArrayList<String> getUniqueSplittedFields(String value) {
+		String[] tmp = value.trim().split(Global_Configuration.INDEX_DELIMITER);
+		
+		//Use set to remove duplication
+		ArrayList<String> result = new ArrayList<String>();
+		Set<String> setResult = new HashSet<String>();
+		
+		for(int i = 0 ; i < tmp.length; i++) {
+			if (!tmp[i].trim().equals("")) {
+				setResult.add(tmp[i].trim());
+				
+			}
+		}
+		result.addAll(setResult);
 		return result;
 	}
 	

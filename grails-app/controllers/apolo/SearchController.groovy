@@ -102,7 +102,7 @@ class SearchController extends BaseController {
 			String stringYears = "";
 			
 			for(Annotation anno : annotations) {
-				println anno.getEntityType() + " " + anno.getEntityValue()
+				//println anno.getEntityType() + " " + anno.getEntityValue()
 				if (anno.getEntityType().equalsIgnoreCase("SONG")) {
 					
 					if (stringSongs.size() > 0) {
@@ -167,27 +167,27 @@ class SearchController extends BaseController {
 			stringArtists = stringArtists.trim()
 			stringYears = stringYears.trim()
 			
-			println "String Songs: " + stringSongs
-			println "String Releases: " + stringReleases
-			println "String Artists: " + stringArtists
-			println "String Years: " + stringYears
+			//println "String Songs: " + stringSongs
+			//println "String Releases: " + stringReleases
+			//println "String Artists: " + stringArtists
+			//println "String Years: " + stringYears
 			
 			if (stringSongs.size() > 0) {
-				songSearcher.addQuery(false, "songTitle", stringSongs, Occur.MUST, (float)2)
+				songSearcher.addQuery(false, stringSongs, "songTitle", Occur.SHOULD, (float)2)
 				releaseSearcher.addQuery(false, stringSongs, "releaseSongs", Occur.SHOULD)
 			}
 			
 			if (stringReleases.size() > 0) {
-				releaseSearcher.addQuery(false, stringReleases, spellingCorrectedString, Occur.MUST)
+				releaseSearcher.addQuery(false, stringReleases, "releaseName", Occur.MUST)
 			}
 			
 			if (stringArtists.size() > 0) {
 				artistSearcher.addQuery(false, stringArtists, "artistName", Occur.MUST, (float)2)
-				songSearcher.addQuery(false, "songArtists", stringSongs , Occur.SHOULD, (float)5)
+				songSearcher.addQuery(false, stringArtists, "songArtists" , Occur.SHOULD, (float)5)
 			}
 			
 			if (stringYears.size() > 0) {
-				songSearcher.addQuery(false, "songYear", stringYears , Occur.SHOULD, (float)5)
+				songSearcher.addQuery(false, stringYears, "songYear" , Occur.SHOULD, (float)10)
 			}
 			
 			println "BUILD QUERY ANNOTATIONS: " + ((System.currentTimeMillis() - start)) * 1.0 / 1000
@@ -195,7 +195,8 @@ class SearchController extends BaseController {
 			
 			//Check if annotation for song/artist/release exist, if not we need to relax the query criteria
 			if (!existSongAnno) {
-				songSearcher.addQuery(true, query, "songTitle", Occur.SHOULD, (float)5)
+				println "ADD SONG TITLE: " + query
+				songSearcher.addQuery(true, "\"" + query + "\"", "songTitle", Occur.MUST, (float)10)
 				//songSearcher.addQuery("\"" + query + "\"", "songTitle", Occur.MUST, (float)10)
 				songSearcher.addQuery(true, query, "songGenres", Occur.SHOULD)
 				//songSearcher.addQuery(query, "songLyrics", Occur.SHOULD)
@@ -204,14 +205,14 @@ class SearchController extends BaseController {
 			}
 			
 			if (!existReleaseAnno) {
-				releaseSearcher.addQuery(true, query, "releaseName", Occur.SHOULD, (float)1.5)
+				releaseSearcher.addQuery(true, "\"" + query + "\"", "releaseName", Occur.SHOULD, (float)3)
 				releaseSearcher.addQuery(true, query, "releaseType", Occur.SHOULD)
 				releaseSearcher.addQuery(true, query, "releaseSongs", Occur.SHOULD)
 				releaseSearcher.addQuery(true, query, "releaseArtists", Occur.SHOULD)
 			}
 			
 			if (!existArtistAnno) {
-				artistSearcher.addQuery(true, query, "artistName", Occur.SHOULD, (float)1.5)
+				artistSearcher.addQuery(true, "\"" + query + "\"", "artistName", Occur.SHOULD, (float)3)
 				//artistSearcher.addQuery("\"" + query + "\"", "artistName", Occur.MUST, (float)1.5)
 				artistSearcher.addQuery(true, query, "artistType", Occur.SHOULD)
 				artistSearcher.addQuery(true, query, "artistGender", Occur.SHOULD)
@@ -312,8 +313,9 @@ class SearchController extends BaseController {
 					candidate += terms[t] + " "
 				}
 				candidate = candidate.trim()
+				println "\"" + candidate + "\""
 				if (candidate.length() >= 0) {
-					ArrayList<Annotation> tmpAnno = ner.annotateQuery(candidate);
+					ArrayList<Annotation> tmpAnno = ner.annotateQuery("\"" + candidate + "\"");
 					if (tmpAnno.size() > 0) {
 						annotations.addAll(tmpAnno)
 					}
@@ -330,9 +332,9 @@ class SearchController extends BaseController {
 		ArrayList<Annotation> finalAnnotations = new ArrayList<Annotation>()
 		String tmpQuery = query.trim().toLowerCase();
 		for(int i = 0; i < annotations.size(); i++ ) {
-			String v = annotations.get(i).entityValue.toLowerCase();
 			Annotation an = annotations.get(i);
-			if (query.indexOf(v) >= 0) {
+			String v = an.entityValue.toLowerCase();
+			if (tmpQuery.indexOf(v) >= 0) {
 				
 				//Check unique song
 				if (an.getEntityType().equalsIgnoreCase("SONG")) {
@@ -365,8 +367,7 @@ class SearchController extends BaseController {
 					}
 					checkUniqueYears.put(an.getEntityValue(), an.getEntityType())
 				}
-				
-				finalAnnotations.add(annotations.get(i));
+				finalAnnotations.add(an);
 			}
 		}
 		return finalAnnotations
@@ -627,6 +628,7 @@ class SearchController extends BaseController {
 		Autocomplete autoComplete = servletContext.getAttribute("autocomplete");
 		
 		ArrayList<String> suggestions = autoComplete.getCompletionsList(query)
+		Collections.sort(suggestions)
 		def result = [keyword : query , suggestions : suggestions]
 		render result as JSON
 	}

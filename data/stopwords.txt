@@ -168,3 +168,8 @@ ratings of
 tempo of
 key of
 beats of
+raise
+heart
+will
+go
+songs

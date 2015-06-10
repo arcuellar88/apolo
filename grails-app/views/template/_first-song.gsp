@@ -60,7 +60,7 @@
        			<tr>
        				<td>Genre: </td>
        				<td>
-       					<% ArrayList<String> songGenres = song.getSplittedFields(song.songGenres); %>
+       					<% ArrayList<String> songGenres = song.getUniqueSplittedFields(song.songGenres); %>
        					<g:each in="${songGenres}" var="genre" status="i">
        						<g:if test="${i > 0}"><br></g:if>
        						${genre}

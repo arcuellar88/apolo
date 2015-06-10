@@ -52,7 +52,7 @@ public class Autocomplete {
         this.transposeWeight = Double.NEGATIVE_INFINITY;
         this.editDistance = new FixedWeightEditDistance(matchWeight,deleteWeight,insertWeight,substituteWeight,transposeWeight);
         this.maxResults = 5;
-        this.maxQueueSize = 10000;
+        this.maxQueueSize = 1000000;
         this.minScore = -40.0;
         completer = new AutoCompleter(dictionary, editDistance, maxResults, maxQueueSize, minScore);
 	}
@@ -98,7 +98,7 @@ public class Autocomplete {
 		System.out.println("Start load of Autocomplete dictionary");
 		ArrayList<String> queries = new ArrayList<String>();
 		queries.add("SELECT title FROM artists_apolo");
-		queries.add("SELECT title FROM releases_apolo");
+		//queries.add("SELECT title FROM releases_apolo");
 		//queries.add("SELECT title FROM songs_apolo");
 		
 		Connection conn = getConnection();
@@ -116,8 +116,8 @@ public class Autocomplete {
 		    stmt = conn.createStatement();
 		    rs = stmt.executeQuery(q);
 		    while(rs.next()){
-		    	String val = rs.getString("title");
-		    	val = val.substring(0,val.length()-1);
+		    	String val = rs.getString("title").trim();
+		    	//val = val.substring(0,val.length()-1);
 		    	dictionary.put(val.toLowerCase(), 2);
 		    }
 		}

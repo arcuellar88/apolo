@@ -18,6 +18,7 @@ import com.aliasi.spell.WeightedEditDistance;
 
 
 
+import com.aliasi.tokenizer.IndoEuropeanTokenizerFactory;
 import com.aliasi.tokenizer.LineTokenizerFactory;
 
 import java.sql.Connection;
@@ -35,8 +36,8 @@ public class NER {
 	private ArrayList<String> filenames;
 	private ArrayList<String> clases;
 	//another variable could be the Lucene index if we use it to get the entities
-	//MapDictionary<String> dictionaryExact; /** Dictionary that contains the entities that will be recognized */
-	//ExactDictionaryChunker dictionaryChunkerExact;
+	MapDictionary<String> dictionaryExact; /** Dictionary that contains the entities that will be recognized */
+	ExactDictionaryChunker dictionaryChunkerExact;
 	ApproxDictionaryChunker dictionaryChunkerApp;
 	private static final double CHUNK_SCORE = 1.0;
 	private Map<String, Integer> stopwords;
@@ -78,7 +79,7 @@ public class NER {
 		lines = FileLineReader.readLineArray(sw,"UTF-8");
 		if(lines != null){
 			for(String stw : lines){
-				this.stopwords.put(stw,1);
+				this.stopwords.put(stw.toLowerCase(),1);
 			}
 		}
 			
@@ -126,6 +127,7 @@ public class NER {
 																	//if there are quotes in the query then it will have one element per string outside of quotes
 		String elems[] = this.query.split("\"");
 		for(int i=0; i<elems.length; i++){
+			if (elems[i].length() <= 0) continue;
 			if(i%2==0){
 				approxQueryElems.add(elems[i]);
 			}else{
@@ -137,8 +139,8 @@ public class NER {
 			Iterator<String> it = exactQueryElems.iterator();
 			while(it.hasNext()){
 				String text = it.next();
-				//Chunking chunking = dictionaryChunkerExact.chunk(text);
-				Chunking chunking = this.dictionaryChunkerApp.chunk(text);
+				Chunking chunking = dictionaryChunkerExact.chunk(text);
+				//Chunking chunking = this.dictionaryChunkerApp.chunk(text);
 				for (Chunk chunk : chunking.chunkSet()) {
 					int start = chunk.start();
 		            int end = chunk.end();
@@ -260,7 +262,7 @@ public class NER {
 	 */
 	private void loadDictionaryFromDB(){
 		//MapDictionary<String> dictionaryExact = new MapDictionary<String>();
-		//this.dictionaryExact = new MapDictionary<String>();
+		this.dictionaryExact = new MapDictionary<String>();
 		//this.dictionaryApprox = new TrieDictionary<String>();
 		TrieDictionary<String> dictionaryApprox = new TrieDictionary<String>();
 		System.out.println("Start load of NER dictionary");
@@ -279,10 +281,10 @@ public class NER {
 			    stmt = conn.createStatement();
 			    rs = stmt.executeQuery(queries.get(i));
 			    while(rs.next()){
-			    	String val = rs.getString("title");
-			    	val = val.substring(0,val.length()-1);
-			    	//dictionaryExact.addEntry(new DictionaryEntry<String>(val,this.clases.get(i),CHUNK_SCORE));
-			    	dictionaryApprox.addEntry(new DictionaryEntry<String>(val,this.clases.get(i)));
+			    	String val = rs.getString("title").trim();
+			    	//val = val.substring(0,val.length()-1);
+			    	dictionaryExact.addEntry(new DictionaryEntry<String>(val,this.clases.get(i),CHUNK_SCORE));
+			    	//dictionaryApprox.addEntry(new DictionaryEntry<String>(val,this.clases.get(i)));
 			    }
 			}
 			catch (SQLException ex){
@@ -307,7 +309,7 @@ public class NER {
 		}
 		
 		System.out.println("finished loading NER dictionary");
-		//this.dictionaryChunkerExact = new ExactDictionaryChunker(dictionaryExact, IndoEuropeanTokenizerFactory.INSTANCE, false,false);
+		this.dictionaryChunkerExact = new ExactDictionaryChunker(dictionaryExact, IndoEuropeanTokenizerFactory.INSTANCE, true,false);
 		
 		double matchWeight = 0.0;
 		double insertWeight = -1.0;
@@ -344,10 +346,12 @@ public class NER {
 	private boolean isStopWord(String v){
 		boolean isStopWord = false;
 		v = v.replace("\"", "");
+		
 		if(v.charAt(v.length()-1)==' '){
 			v = v.substring(0, v.length()-1);
 		}
-		if(this.stopwords.containsKey(v)){
+		System.out.println("CHECKSTOP:" + v);
+		if(this.stopwords.containsKey(v.toLowerCase())){
 			isStopWord = true;
 		}
 		return isStopWord;
@@ -364,7 +368,7 @@ public class NER {
 						"Shakira in 2007", "2007", 
 						"of", "\"I\"", "\"Now\"", "\"Now I do\"", "Like you do",
 						"Songs of \"Shakira\" that were released in 2007",
-						"I Knowssa", "Knowssa", "\"Knowssa\""
+						"I Knowssa", "Knowssa", "\"Knowssa\"" , "\"Oliver Georgi\""
 						
 				};
 		
