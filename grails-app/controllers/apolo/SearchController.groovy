@@ -70,7 +70,7 @@ class SearchController extends BaseController {
 			Searcher songSearcher = new Searcher(Global_Configuration.INDEX_DIRECTORY, indexSearcher)
 			songSearcher.addQuery("song", "type", Occur.MUST)
 			songSearcher.setPage(1)
-			songSearcher.setResultPerPage(40)
+			songSearcher.setResultPerPage(30)
 			
 			//Searcher for release
 			Searcher releaseSearcher = new Searcher(Global_Configuration.INDEX_DIRECTORY, indexSearcher)
@@ -93,10 +93,12 @@ class SearchController extends BaseController {
 			
 			//Get annotation
 			ArrayList<Annotation> annotations = ner.annotateQuery(query)
+			print "ANNOTATION SIZE: " + annotations.size()
 			for(Annotation anno : annotations) {
+				println anno.getEntityType() + " " + anno.getEntityValue()
 				if (anno.getEntityType().equalsIgnoreCase("SONG")) {
 					//Main search
-					songSearcher.addQuery(anno.getEntityValue(), "songTitle", Occur.SHOULD, (float)2)
+					songSearcher.addQuery(anno.getEntityValue(), "songTitle", Occur.SHOULD, (float)10)
 					
 					//Additional information
 					releaseSearcher.addQuery(anno.getEntityValue(), "releaseSongs", Occur.SHOULD)
@@ -108,11 +110,12 @@ class SearchController extends BaseController {
 					releaseSearcher.addQuery(anno.getEntityValue(), "releaseName", Occur.SHOULD, (float)2)
 					
 					//Additional information
-					songSearcher.addQuery(anno.getEntityValue(), "songReleaseName", Occur.SHOULD)
+					//songSearcher.addQuery(anno.getEntityValue(), "songReleaseName", Occur.SHOULD)
 					
 					existReleaseAnno = true
 				}
 				else if (anno.getEntityType().equalsIgnoreCase("ARTIST")) {
+					
 					//Main search
 					artistSearcher.addQuery(anno.getEntityValue(), "artistName", Occur.SHOULD, (float)2)
 					
@@ -120,7 +123,8 @@ class SearchController extends BaseController {
 					releaseSearcher.addQuery(anno.getEntityValue(), "releaseArtists", Occur.SHOULD)
 					
 					//Additional information for song
-					songSearcher.addQuery(anno.getEntityValue(), "songArtists", Occur.SHOULD, (float)1.5)
+					println "ADD song of artist: " + anno.getEntityValue()
+					songSearcher.addQuery("\"" + anno.getEntityValue() + "\"", "songArtists", Occur.MUST)
 					
 					existArtistAnno = true
 				}
@@ -131,9 +135,10 @@ class SearchController extends BaseController {
 			
 			//Check if annotation for song/artist/release exist, if not we need to relax the query criteria
 			if (!existSongAnno) {
-				songSearcher.addQuery(query, "songTitle", Occur.SHOULD, (float)1.5)
-				songSearcher.addQuery(query, "songLabels", Occur.SHOULD)
-				songSearcher.addQuery(query, "songLyrics", Occur.SHOULD)
+				songSearcher.addQuery(query, "songTitle", Occur.SHOULD, (float)5)
+				//songSearcher.addQuery("\"" + query + "\"", "songTitle", Occur.MUST, (float)10)
+				songSearcher.addQuery(query, "songGenres", Occur.SHOULD)
+				//songSearcher.addQuery(query, "songLyrics", Occur.SHOULD)
 				songSearcher.addQuery(query, "songCountries", Occur.SHOULD)
 				songSearcher.addQuery(query, "songContinents", Occur.SHOULD)
 			}
@@ -147,6 +152,7 @@ class SearchController extends BaseController {
 			
 			if (!existArtistAnno) {
 				artistSearcher.addQuery(query, "artistName", Occur.SHOULD, (float)1.5)
+				artistSearcher.addQuery("\"" + query + "\"", "artistName", Occur.MUST, (float)1.5)
 				artistSearcher.addQuery(query, "artistType", Occur.SHOULD)
 				artistSearcher.addQuery(query, "artistGender", Occur.SHOULD)
 				artistSearcher.addQuery(query, "artistCountry", Occur.SHOULD)

@@ -135,7 +135,6 @@ public class DPPediaHTTPSPARQL implements IDBpedia {
 				"filter langMatches(lang(?desc),\"en\") }";
 
 		String queryResult = this.makeQuery(query)
-		// System.out.println (queryResult);
 
 		try {
 			def slurper = new JsonSlurper()

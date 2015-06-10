@@ -60,3 +60,19 @@ ul.typeahead.dropdown-menu>li:hover,ul.typeahead.dropdown-menu>li.active,ul.type
 .centered {
 	text-align:center;
 }
+
+@media (min-width: 1200px) {
+  .content-wrapper {
+     background-image: url(../img/background.jpg);
+     background-repeat: no-repeat;
+  }
+}
+
+@media (min-width: 1400px) {
+  .content-wrapper {
+     background-image: url(../img/background.jpg);
+     background-repeat: no-repeat;
+     background-size: 100%;
+  }
+}
+

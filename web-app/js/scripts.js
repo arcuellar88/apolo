@@ -35,6 +35,7 @@ function initLoadAllArtistSongs() {
 			 },
 			 success: function(data) {
 				 container.html(data.data);
+				 initModalEntity();
 			 }
 		});
 	});
