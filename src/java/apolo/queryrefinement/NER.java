@@ -68,10 +68,10 @@ public class NER {
 	
 	private void loadStopWords(){
 		this.stopwords = new HashMap<String,Integer>();
-		String path = System.getProperty("user.dir");
-		String fullpath = path + File.separator + "data" + File.separator;
+		//String path = System.getProperty("user.dir");
+		//String fullpath = path + File.separator + "data" + File.separator;
     	
-		//String fullpath = Global_Configuration.DATA_FOLDER + File.separator;
+		String fullpath = Global_Configuration.DATA_FOLDER + File.separator;
 		File sw = new File(fullpath+"stopwords.txt");
 		String[] lines = null;
 		try{
