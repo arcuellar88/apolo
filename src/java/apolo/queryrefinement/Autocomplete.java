@@ -156,7 +156,7 @@ public class Autocomplete {
 		return conn;
 	}
 	
-	
+	/*
 	public static void main(String a[]){
 		System.out.println("test autocomplete");
 		Autocomplete ac = new Autocomplete();
@@ -176,5 +176,6 @@ public class Autocomplete {
 		}
 		
 	}
+	*/
 
 }
