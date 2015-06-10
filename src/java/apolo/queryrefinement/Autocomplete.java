@@ -69,8 +69,7 @@ public class Autocomplete {
 				lines = FileLineReader.readLineArray(files.get(m),"UTF-8");
 				if(lines != null){
 					for(String elem : lines){
-						String name = elem;
-						dictionary.put(elem, 2); //0 is for SONG
+						dictionary.put(elem.toLowerCase(), 2); //0 is for SONG
 					}
 				}
 			}
@@ -81,13 +80,15 @@ public class Autocomplete {
 	}
 	
 	public ArrayList<String> getCompletionsList(String input){
-		SortedSet<ScoredObject<String>> completions = completer.complete(input);
+		SortedSet<ScoredObject<String>> completions = completer.complete(input.toLowerCase());
 		ArrayList<String> completionsList = new ArrayList<String>();
 		for (ScoredObject<String> so : completions){
 			completionsList.add(so.getObject());
 		}
 		return completionsList;
 	}
+	
+	
 	
 	/***
 	 * Loads the songs, artists and releases to the dictionary.
@@ -117,7 +118,7 @@ public class Autocomplete {
 		    while(rs.next()){
 		    	String val = rs.getString("title");
 		    	val = val.substring(0,val.length()-1);
-		    	dictionary.put(val, 2);
+		    	dictionary.put(val.toLowerCase(), 2);
 		    }
 		}
 		catch (SQLException ex){
@@ -155,40 +156,25 @@ public class Autocomplete {
 		return conn;
 	}
 	
-	/*
+	
 	public static void main(String a[]){
-		System.out.println("Starting Autocomplete");
+		System.out.println("test autocomplete");
 		Autocomplete ac = new Autocomplete();
-		System.out.println("Autocomplete instance created");
-		String q2 = "Ten Years";
-		String q = "Silver";
-		String q3 = "Pearl";
+		System.out.println("test autocomplete");
+		String qs[] = {"Ten Years", "ten years", "Britney Spear", "britney", "elto",  "Silver", "Pearl", "Elto", "the beat", "The Bea", "paul mcc", "Paul Mcca"};
 		ArrayList<String> comp;
 		System.out.println("load finished");
-		comp = ac.getCompletionsList(q);
-		Iterator<String> it = comp.iterator();
-		System.out.println("\n\nQuery: "+q);
-		while(it.hasNext()){
-			String rs = it.next();
-			System.out.println(rs);
+		
+		for(int i=0; i<qs.length; i++){
+			comp = ac.getCompletionsList(qs[i]);
+			Iterator<String> it = comp.iterator();
+			System.out.println("\n\nQuery: "+qs[i]);
+			while(it.hasNext()){
+				String rs = it.next();
+				System.out.println(rs);
+			}
 		}
 		
-		ArrayList<String> comp2 = ac.getCompletionsList(q2);
-		Iterator<String> it2 = comp2.iterator();
-		System.out.println("\n\nQuery: "+q2);
-		while(it2.hasNext()){
-			String rs = it2.next();
-			System.out.println(rs);
-		}
-		
-		ArrayList<String> comp3 = ac.getCompletionsList(q3);
-		Iterator<String> it3 = comp3.iterator();
-		System.out.println("\n\nQuery: "+q3);
-		while(it3.hasNext()){
-			String rs = it3.next();
-			System.out.println(rs);
-		}
 	}
-	*/
 
 }
