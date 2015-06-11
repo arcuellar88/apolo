@@ -98,7 +98,7 @@ public class Autocomplete {
 		System.out.println("Start load of Autocomplete dictionary");
 		ArrayList<String> queries = new ArrayList<String>();
 		queries.add("SELECT title FROM artists_apolo");
-		//queries.add("SELECT title FROM releases_apolo");
+		queries.add("SELECT title FROM releases_apolo");
 		//queries.add("SELECT title FROM songs_apolo");
 		
 		Connection conn = getConnection();

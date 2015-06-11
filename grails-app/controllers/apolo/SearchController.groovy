@@ -101,6 +101,8 @@ class SearchController extends BaseController {
 			String stringReleases = "";
 			String stringYears = "";
 			
+			int countArtistsAnnotation = 0;
+			
 			for(Annotation anno : annotations) {
 				//println anno.getEntityType() + " " + anno.getEntityValue()
 				if (anno.getEntityType().equalsIgnoreCase("SONG")) {
@@ -136,6 +138,8 @@ class SearchController extends BaseController {
 				}
 				else if (anno.getEntityType().equalsIgnoreCase("ARTIST")) {
 					
+					countArtistsAnnotation++
+					
 					if (stringArtists.size() > 0) {
 						stringArtists += " OR";
 					}
@@ -162,6 +166,8 @@ class SearchController extends BaseController {
 				}
 			}
 			
+			boolean querySongOf = false;
+			
 			stringSongs = stringSongs.trim()
 			stringReleases = stringReleases.trim()
 			stringArtists = stringArtists.trim()
@@ -183,7 +189,16 @@ class SearchController extends BaseController {
 			
 			if (stringArtists.size() > 0) {
 				artistSearcher.addQuery(false, stringArtists, "artistName", Occur.MUST, (float)2)
-				songSearcher.addQuery(false, stringArtists, "songArtists" , Occur.SHOULD, (float)5)
+				String tmpQuery = query.trim().replaceAll("\\s+", " ")
+				String tmpQueryArtist1 = "song of " + stringArtists.replaceAll("\"", "").trim()
+				String tmpQueryArtist2 = "songs of " + stringArtists.replaceAll("\"", "").trim()
+				if (tmpQueryArtist1.equalsIgnoreCase(tmpQuery) || tmpQueryArtist2.equalsIgnoreCase(tmpQuery)) {
+					querySongOf = true;
+					songSearcher.addQuery(false, stringArtists, "songArtists" , Occur.MUST, (float)5)
+				}
+				else {
+					songSearcher.addQuery(false, stringArtists, "songArtists" , Occur.SHOULD, (float)9)
+				}
 			}
 			
 			if (stringYears.size() > 0) {
@@ -195,8 +210,9 @@ class SearchController extends BaseController {
 			
 			//Check if annotation for song/artist/release exist, if not we need to relax the query criteria
 			if (!existSongAnno) {
-				println "ADD SONG TITLE: " + query
-				songSearcher.addQuery(true, "\"" + query + "\"", "songTitle", Occur.MUST, (float)10)
+				if (!querySongOf) {
+					songSearcher.addQuery(true, "\"" + query + "\"", "songTitle", Occur.MUST, (float)10)
+				}
 				//songSearcher.addQuery("\"" + query + "\"", "songTitle", Occur.MUST, (float)10)
 				songSearcher.addQuery(true, query, "songGenres", Occur.SHOULD)
 				//songSearcher.addQuery(query, "songLyrics", Occur.SHOULD)

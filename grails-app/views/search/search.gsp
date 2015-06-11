@@ -16,7 +16,7 @@
 					<g:form name="search-form" method="get" role="form" controller="search" action="index">
 						<div class="form-group">
 							<div class="input-group">
-			                    <input required value="${params.keyword}" name="keyword" autocomplete="off" id="search" type="text" class="form-control input-lg" placeholder="What are you looking for?">
+			                    <input tabindex="1" required value="${params.keyword}" name="keyword" autocomplete="off" id="search" type="text" class="form-control input-lg" placeholder="What are you looking for?">
 			                    <span class="input-group-addon"><a id="voice-search-btn" href="javascript:void(0)"><i class="fa fa-microphone"></i></a></span>
 			                    <span class="input-group-addon"><a id="voice-record-btn" href="javascript:void(0)"><i class="fa fa-headphones"></i></a></span>
 	                  		</div>

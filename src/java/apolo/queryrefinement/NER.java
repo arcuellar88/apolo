@@ -350,7 +350,6 @@ public class NER {
 		if(v.charAt(v.length()-1)==' '){
 			v = v.substring(0, v.length()-1);
 		}
-		System.out.println("CHECKSTOP:" + v);
 		if(this.stopwords.containsKey(v.toLowerCase())){
 			isStopWord = true;
 		}
